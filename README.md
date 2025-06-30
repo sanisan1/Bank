@@ -24,31 +24,7 @@
 
 ✅ Обработка ошибок и валидация
 
-🛠️ Как запустить
-📦 Через IDE (IntelliJ IDEA)
-Склонируй проект:
 
-bash
-Копировать
-Редактировать
-git clone https://github.com/yourusername/virtual-bank.git
-Открой в IntelliJ IDEA
-
-Запусти BankApplication.java
-
-🐘 Через Gradle
-bash
-Копировать
-Редактировать
-./gradlew bootRun
-🧪 Тестовые данные
-Все данные хранятся в памяти (H2) и очищаются при перезапуске
-
-Консоль H2 доступна по адресу: http://localhost:8080/h2-console
-
-JDBC URL: jdbc:h2:mem:testdb
-
-User: sa, Password: (пусто)
 
 🧪 Примеры запросов
 ➕ Создание пользователя
