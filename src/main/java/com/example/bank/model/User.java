@@ -27,11 +27,22 @@ public class User {
     private String lastName;
     private String phoneNumber;
 
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
+    private Role role;
+
     @Column(nullable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @Column(nullable = false)
     private Boolean blocked;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
@@ -55,7 +66,7 @@ public class User {
     }
 
     // Конструктор для удобства (без ролей, так как в вашем коде роли не используются)
-    public User(Long userId, Boolean blocked, LocalDateTime createdAt, String phoneNumber, String lastName, String firstName, String email, String password, String username) {
+    public User(Long userId, Boolean blocked, LocalDateTime createdAt, String phoneNumber, String lastName, String firstName, String email, String password, String username, Role role) {
         this.userId = userId;
         this.blocked = blocked != null ? blocked : false; // если null, ставим false
         this.createdAt = createdAt;
@@ -65,6 +76,7 @@ public class User {
         this.email = email;
         this.password = password;
         this.username = username;
+        this.role = role;
     }
 
     public Long getUserId() {

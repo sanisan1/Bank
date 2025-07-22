@@ -5,6 +5,7 @@ import com.example.bank.mapper.UserMapper;
 import com.example.bank.model.CreateUserDto;
 import com.example.bank.model.User;
 import com.example.bank.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,9 +13,11 @@ import java.util.List;
 @Service
 public class UserService {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public User createUser(CreateUserDto createUserDto) {
@@ -23,6 +26,7 @@ public class UserService {
         }
 
         User user = UserMapper.toEntity(createUserDto);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
 
@@ -46,6 +50,7 @@ public class UserService {
         if (!userRepository.existsById(user.getUserId())) {
             throw new ResourceNotFoundException("User", "id", user.getUserId());
         }
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
 }

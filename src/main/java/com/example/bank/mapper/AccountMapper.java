@@ -4,8 +4,9 @@ import com.example.bank.model.Account;
 import com.example.bank.model.AccountDto;
 import com.example.bank.model.CreateAccountDto;
 import com.example.bank.model.User;
+import org.springframework.stereotype.Component;
 
-
+@Component
 public class AccountMapper {
 
 
