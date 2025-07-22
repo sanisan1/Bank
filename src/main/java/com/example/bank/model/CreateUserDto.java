@@ -26,6 +26,17 @@ public class CreateUserDto {
     @NotBlank
     private String phoneNumber;
 
+    public  Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+
+    private Role role;
+
 
 
     private LocalDateTime createdAt;
@@ -40,7 +51,7 @@ public class CreateUserDto {
     }
 
     // Конструктор для удобства (без ролей, так как в вашем коде роли не используются)
-    public CreateUserDto(Long userId, Boolean blocked, LocalDateTime createdAt, String phoneNumber, String lastName, String firstName, String email, String password, String username) {
+    public CreateUserDto(Long userId, Boolean blocked, LocalDateTime createdAt, String phoneNumber, String lastName, String firstName, String email, String password, String username, Role role) {
         this.userId = userId;
         this.blocked = blocked != null ? blocked : false; // если null, ставим false
         this.createdAt = createdAt;
@@ -50,6 +61,7 @@ public class CreateUserDto {
         this.email = email;
         this.password = password;
         this.username = username;
+        this.role = role;
     }
 
     public Long getUserId() {
