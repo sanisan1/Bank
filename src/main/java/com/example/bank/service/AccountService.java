@@ -6,6 +6,8 @@ import com.example.bank.mapper.AccountMapper;
 import com.example.bank.model.*;
 import com.example.bank.repository.AccountRepository;
 import com.example.bank.repository.UserRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,8 +29,12 @@ public class AccountService {
     }
 
     public Account save(CreateAccountDto accountDto) {
-        User user = userRepository.findById(accountDto.getUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("User", "id", accountDto.getUserId()));
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
 
         if (accountDto.getBlocked() == null) {
             accountDto.setBlocked(false);
@@ -109,6 +115,10 @@ public class AccountService {
 
     @Transactional
     public TransferResponseDto transfer(Long fromAccountId, Long toAccountId, BigDecimal amount, String comment) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new InvalidOperationException("Amount must be greater than zero");
         }

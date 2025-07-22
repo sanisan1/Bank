@@ -18,6 +18,7 @@ public class UserMapper {
         user.setCreatedAt(createUserDto.getCreatedAt());
         user.setBlocked(createUserDto.getBlocked());
         user.setBlocked(createUserDto.getBlocked());
+        user.setRole(createUserDto.getRole());
 
         return user;
     }
@@ -34,6 +35,8 @@ public class UserMapper {
         userDto.setCreatedAt(user.getCreatedAt());
         userDto.setBlocked(user.getBlocked());
         userDto.setBlocked(user.getBlocked());
+        userDto.setRole(user.getRole());
+
         return userDto;
     }
 }
