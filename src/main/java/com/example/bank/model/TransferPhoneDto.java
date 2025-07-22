@@ -15,6 +15,7 @@ public class TransferPhoneDto {
     @Min(10)
     private BigDecimal amount;
     private String comment;
+    
     public TransferPhoneDto() {
 
     }

@@ -50,6 +50,7 @@ public class UserService {
         if (!userRepository.existsById(user.getUserId())) {
             throw new ResourceNotFoundException("User", "id", user.getUserId());
         }
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
 }

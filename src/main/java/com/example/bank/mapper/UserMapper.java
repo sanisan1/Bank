@@ -4,7 +4,9 @@ import com.example.bank.model.Account;
 import com.example.bank.model.CreateUserDto;
 import com.example.bank.model.User;
 import com.example.bank.model.UserDto;
+import org.springframework.stereotype.Component;
 
+@Component
 public class UserMapper {
     public static User toEntity(CreateUserDto createUserDto) {
         User user = new User();
@@ -16,7 +18,6 @@ public class UserMapper {
         user.setLastName(createUserDto.getLastName());
         user.setPhoneNumber(createUserDto.getPhoneNumber());
         user.setCreatedAt(createUserDto.getCreatedAt());
-        user.setBlocked(createUserDto.getBlocked());
         user.setBlocked(createUserDto.getBlocked());
         user.setRole(createUserDto.getRole());
 
@@ -33,7 +34,6 @@ public class UserMapper {
         userDto.setLastName(user.getLastName());
         userDto.setPhoneNumber(user.getPhoneNumber());
         userDto.setCreatedAt(user.getCreatedAt());
-        userDto.setBlocked(user.getBlocked());
         userDto.setBlocked(user.getBlocked());
         userDto.setRole(user.getRole());
 

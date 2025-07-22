@@ -5,12 +5,16 @@ import com.example.bank.exception.ResourceNotFoundException;
 import com.example.bank.mapper.AccountMapper;
 import com.example.bank.model.*;
 import com.example.bank.repository.AccountRepository;
+import com.example.bank.repository.TransactionRepository;
 import com.example.bank.repository.UserRepository;
+import com.example.bank.security.AccountSecurity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -22,48 +26,38 @@ public class AccountService {
 
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
+    private final TransactionRepository transactionRepository;
     private static final Random random = new Random();
+    private final AccountSecurity accountSecurity;
 
-    private User getCurrentUser() {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
-    }
-    private void assertAccountBelongsToCurrentUser(Account account) {
-        User currentUser = getCurrentUser();
-        if (!account.getUser().getUserId().equals(currentUser.getUserId())) {
-            throw new InvalidOperationException("Access denied: not your account");
-        }
-    }
-
-
-
-
-    public AccountService(AccountRepository accountRepository, UserRepository userRepository) {
+    public AccountService(AccountRepository accountRepository, UserRepository userRepository, AccountSecurity accountSecurity, TransactionRepository transactionRepository) {
         this.accountRepository = accountRepository;
         this.userRepository = userRepository;
+        this.accountSecurity = accountSecurity;
+        this.transactionRepository = transactionRepository;
     }
 
-    public Account save(CreateAccountDto accountDto) {
-
+    private User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
+            throw new AccessDeniedException("User is not authenticated");
+        }
         String username = authentication.getName();
-
-
-
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
+        return user;
 
+    }
+    @Transactional
+    public Account save(CreateAccountDto accountDto) {
 
+        User user = getCurrentUser();
 
         if (accountDto.getBlocked() == null) {
             accountDto.setBlocked(false);
         }
 
         Account account = AccountMapper.toEntity(accountDto, user, generateUniqueId());
-        if (account.getBalance().compareTo(BigDecimal.ZERO) <= 0) {
-            account.setBalance(BigDecimal.ZERO);
-        }
         Account savedAccount = accountRepository.save(account);
 
         if (user.getMainAccount() == null) {
@@ -75,53 +69,29 @@ public class AccountService {
     }
 
     public Optional<Account> findById(Long id) {
-        if (getCurrentUser().getRole() == Role.ADMIN) {
-            return accountRepository.findById(id);
-        } else {
-            throw new AccessDeniedException("Access denied: Current role is " + getCurrentUser().getRole());
-        }
+        return accountRepository.findById(id);
     }
-
-
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     public List<Account> findAll() {
-        if (getCurrentUser().getRole() == Role.ADMIN) {
+        User user = getCurrentUser();
+        if (user.getRole() == Role.ADMIN) {
             return accountRepository.findAll();
         } else {
-            throw new AccessDeniedException("Access denied: Current role is " + getCurrentUser().getRole());
+            return accountRepository.findByUserUserId(user.getUserId());
         }
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     public Account update(Account account) {
-        User user = getCurrentUser();
-
-        Optional<Account> existingAccountOpt = accountRepository.findById(account.getId());
-        if (existingAccountOpt.isEmpty()) {
-            throw new ResourceNotFoundException("Account", "id", account.getId());
-        }
-
-        Account existingAccount = existingAccountOpt.get();
-
-        if (user.getRole() == Role.ADMIN || existingAccount.getUser().getUserId().equals(user.getUserId())) {
-            return accountRepository.save(account);
-        } else {
-            throw new AccessDeniedException("Access denied: You can update only your own accounts");
-        }
+        return accountRepository.save(account);
     }
-
-
-
+    @PreAuthorize("hasRole('ADMIN')")
     public void setUserByUserId(Long userId, Account account) {
-        if (getCurrentUser().getRole() == Role.ADMIN) {
-            User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
-            account.setUser(user);
-        } else {
-            throw new AccessDeniedException("Access denied: Current role is " + getCurrentUser().getRole());
-        }
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+        account.setUser(user);
     }
-
+    @PreAuthorize("@accountSecurity.isOwner(#id)")
     public void deposit(Long id, BigDecimal amount) {
-
         Account account = accountRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Account", "id", id));
 
@@ -131,12 +101,19 @@ public class AccountService {
 
         account.setBalance(account.getBalance().add(amount));
         accountRepository.save(account);
-    }
 
+        Transaction transaction = new Transaction();
+        transaction.setOperationType(OperationType.deposit);
+        transaction.setAmount(amount);
+        transaction.setToAccount(account);
+        transaction.setToUser(account.getUser());
+        transactionRepository.save(transaction);
+
+    }
+    @PreAuthorize("@accountSecurity.isOwner(#id)")
     public void withdraw(Long id, BigDecimal amount) {
         Account account = accountRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Account", "id", id));
-        assertAccountBelongsToCurrentUser(account);
 
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new InvalidOperationException("Amount must be greater than zero");
@@ -161,46 +138,48 @@ public class AccountService {
         } while (accountRepository.existsById(number));
         return number;
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteById(Long id) {
-        Account account = accountRepository.findById(id).get();
-        User user = getCurrentUser();
-
-        Optional<Account> existingAccountOpt = accountRepository.findById(account.getId());
-        if (existingAccountOpt.isEmpty()) {
-            throw new ResourceNotFoundException("Account", "id", account.getId());
-        }
-
-        Account existingAccount = existingAccountOpt.get();
-
-        if ((user.getRole() == Role.ADMIN || existingAccount.getUser().getUserId().equals(user.getUserId())) && account.getBalance().compareTo(BigDecimal.ZERO) == 0) {
-            accountRepository.deleteById(id);
-        } else {
-            throw new AccessDeniedException("Access denied: You can update only your own accounts");
-        }
-
-
+        accountRepository.deleteById(id);
     }
 
     @Transactional
-    public TransferResponseDto transfer(Long fromAccountId, Long toAccountId, BigDecimal amount, String comment) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
+    public TransferResponseDto transfer(Long fromAccId, Long toAccountId, BigDecimal amount, String comment) {
+        User currentUser = getCurrentUser();
+        if (fromAccId == null) {
+            if (currentUser.getMainAccount() == null) {
+                throw new InvalidOperationException("Main account is not set for current user");
+            }
+            fromAccId = currentUser.getMainAccount().getId();
+        } else {
+            if (!accountSecurity.isOwner(fromAccId)) {
+                throw new InvalidOperationException("Not owner acount");
+            }
+        }
+        Long resolvedFromAccId = fromAccId;
+        if (resolvedFromAccId == null) {
 
+            if (currentUser.getMainAccount() == null) {
+                throw new InvalidOperationException("Main account is not set for current user");
+            }
+            resolvedFromAccId = currentUser.getMainAccount().getId();
+        }
+
+        final Long finalFromAccId = resolvedFromAccId; //делаем финальной для использования в лямбде
 
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new InvalidOperationException("Amount must be greater than zero");
         }
 
-        Account fromAccount = accountRepository.findById(fromAccountId)
-                .orElseThrow(() -> new ResourceNotFoundException("Account", "id", fromAccountId));
+        Account fromAccount = accountRepository.findById(finalFromAccId)
+                .orElseThrow(() -> new ResourceNotFoundException("Account", "id", finalFromAccId));
+
         Account toAccount = accountRepository.findById(toAccountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Account", "id", toAccountId));
 
         if (Boolean.TRUE.equals(fromAccount.getBlocked())) {
             throw new InvalidOperationException("Sender account is blocked");
         }
-
         if (amount.compareTo(fromAccount.getBalance()) > 0) {
             throw new InvalidOperationException("Not enough funds");
         }
@@ -210,6 +189,18 @@ public class AccountService {
 
         accountRepository.save(fromAccount);
         accountRepository.save(toAccount);
+
+        Transaction transaction = new Transaction();
+        transaction.setAmount(amount);
+        transaction.setComment(comment);
+        transaction.setFromAccount(fromAccount);
+        transaction.setToAccount(toAccount);
+        transaction.setFromUser(fromAccount.getUser());
+        transaction.setToUser(toAccount.getUser());
+        transaction.setOperationType(OperationType.transfer);
+        transactionRepository.save(transaction);
+
+
 
         return new TransferResponseDto(
                 fromAccount.getUser().getUserId(),
@@ -222,9 +213,13 @@ public class AccountService {
         );
     }
 
+
+
+
     public TransferResponseDto transferByUserId(Long fromAccId, Long toUserId, BigDecimal amount, String comment) {
         User toUser = userRepository.findById(toUserId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", toUserId));
+
 
         return transfer(fromAccId, toUser.getMainAccount().getId(), amount, comment);
     }
@@ -232,6 +227,7 @@ public class AccountService {
     public TransferResponseDto transferByPhone(Long fromAccId, String toPhone, BigDecimal amount, String comment) {
         User toUser = userRepository.findByPhoneNumber(toPhone)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "phone", toPhone));
+
 
         return transfer(fromAccId, toUser.getMainAccount().getId(), amount, comment);
     }

@@ -9,7 +9,7 @@ public class TransferUserIdDto {
 
 
 
-    private Long fromAccouuntId;
+    private Long fromAccId;
 
     @NotNull
     private Long toUserId;
@@ -19,13 +19,6 @@ public class TransferUserIdDto {
     private BigDecimal amount;
 
     private String comment;
-
-    public TransferUserIdDto(Long fromAccouuntId, Long toUserId, BigDecimal amount, String comment) {
-        this.fromAccouuntId = fromAccouuntId;
-        this.toUserId = toUserId;
-        this.amount = amount;
-        this.comment = comment;
-    }
 
 
 
@@ -48,12 +41,12 @@ public class TransferUserIdDto {
         this.toUserId = toUserId;
     }
 
-    public @NotNull Long getFromAccId() {
-        return fromAccouuntId;
+    public Long getFromAccId() {
+        return fromAccId;
     }
 
-    public void setFromAccId(@NotNull Long fromAccouuntId) {
-        this.fromAccouuntId = fromAccouuntId;
+    public void setFromAccId(Long fromAccId) {
+        this.fromAccId = fromAccId;
     }
 
     public String getComment() {
