@@ -12,4 +12,7 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     // Здесь можно добавить свои методы поиска, например:
     List<Account> findByUserUserId(Long userId);
 
+
+
+
 }
