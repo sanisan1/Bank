@@ -41,6 +41,9 @@ public class AccountService {
         }
 
         Account account = AccountMapper.toEntity(accountDto, user, generateUniqueId());
+        if (account.getBalance().compareTo(BigDecimal.ZERO) <= 0) {
+            account.setBalance(BigDecimal.ZERO);
+        }
         Account savedAccount = accountRepository.save(account);
 
         if (user.getMainAccount() == null) {
