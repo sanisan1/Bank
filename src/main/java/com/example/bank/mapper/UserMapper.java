@@ -1,6 +1,5 @@
 package com.example.bank.mapper;
 
-import com.example.bank.model.Account;
 import com.example.bank.model.CreateUserDto;
 import com.example.bank.model.User;
 import com.example.bank.model.UserDto;

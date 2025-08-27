@@ -2,10 +2,13 @@
 
     import com.example.bank.mapper.AccountMapper;
     import com.example.bank.model.*;
+    import com.example.bank.model.Account.*;
+    import com.example.bank.model.Account.DebitAccount.AccountDto;
+    import com.example.bank.model.Account.DebitAccount.AccountOperationRequest;
+    import com.example.bank.model.Account.DebitAccount.DebitAccount;
     import com.example.bank.service.AccountService;
     import jakarta.validation.Valid;
     import org.springframework.http.ResponseEntity;
-    import org.springframework.security.access.prepost.PreAuthorize;
     import org.springframework.web.bind.annotation.*;
 
     import java.math.BigDecimal;
@@ -28,9 +31,9 @@
 
         // ✅ Создание аккаунта
         @PostMapping
-        public ResponseEntity<AccountDto> createAccount(@Valid @RequestBody CreateAccountDto account) {
+        public ResponseEntity<AccountDto> createAccount() {
 
-            Account created = accountService.save(account);
+            DebitAccount created = accountService.createAccount();
             return ResponseEntity.status(201).body(AccountMapper.toDto(created));
         }
 
@@ -97,42 +100,37 @@
 
 
         @PutMapping("/{id}")
-        public ResponseEntity<AccountDto> updateAccountfull(@RequestBody Account account, @PathVariable Long id) {
+        public ResponseEntity<AccountDto> updateAccountfull(@RequestBody DebitAccount account, @PathVariable Long id) {
             account.setId(id); // Убедись, что ID совпадает
-            Account updated = accountService.update(account);
+            DebitAccount updated = accountService.update(account);
             return ResponseEntity.ok(AccountMapper.toDto(updated));
         }
 
-        @PostMapping("/{id}/withdraw")
-        public ResponseEntity<AccountDto> withdraw(@PathVariable Long id,
+        @PostMapping("/{accountNumber}/withdraw")
+        public ResponseEntity<AccountDto> withdraw(@PathVariable String accountNumber,
                                                    @Valid @RequestBody AccountOperationRequest request) {
-            Account account = accountService.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Account not found"));
-
-            accountService.withdraw(id, request.getAmount());
-            Account updated = accountService.findById(id).orElseThrow();
-            return ResponseEntity.ok(AccountMapper.toDto(updated));
+            AccountDto updated = accountService.withdraw(accountNumber,request.getAmount());
+            return ResponseEntity.ok(updated);
         }
 
-        @PostMapping("/{id}/deposit")
-        public ResponseEntity<AccountDto> deposit(@PathVariable Long id,
+        @PostMapping("/{accountNumber}/deposit")
+        public ResponseEntity<AccountDto> deposit(@PathVariable String accountNumber,
                                                   @Valid @RequestBody AccountOperationRequest request) {
-            Account account = accountService.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Account not found"));
+            System.out.println("accountNumber = " + accountNumber);
+            AccountDto updated = accountService.deposit(accountNumber, request.getAmount());
 
-            accountService.deposit(id, request.getAmount());
-            Account updated = accountService.findById(id).orElseThrow();
-            return ResponseEntity.ok(AccountMapper.toDto(updated));
+
+            return ResponseEntity.ok(updated);
         }
 
         @PatchMapping("/{id}")
         public ResponseEntity<AccountDto> updateAccount(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
-            Optional<Account> optionalAccount = accountService.findById(id);
+            Optional<DebitAccount> optionalAccount = accountService.findById(id);
             if (optionalAccount.isEmpty()) {
                 return ResponseEntity.notFound().build();
             }
 
-            Account account = optionalAccount.get();
+            DebitAccount account = optionalAccount.get();
 
             updates.forEach((key, value) -> {
                 switch (key) {
@@ -155,7 +153,7 @@
                 }
             });
 
-            Account updated = accountService.update(account);
+            DebitAccount updated = accountService.update(account);
             return ResponseEntity.ok(AccountMapper.toDto(updated));
         }
 

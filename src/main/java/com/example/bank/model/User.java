@@ -1,5 +1,6 @@
 package com.example.bank.model;
 
+import com.example.bank.model.Account.DebitAccount.DebitAccount;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -47,19 +48,19 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore
-    private List<Account> accounts = new ArrayList<>();
+    private List<DebitAccount> accounts = new ArrayList<>();
 
-    public Account getMainAccount() {
+    public DebitAccount getMainAccount() {
         return mainAccount;
     }
 
-    public void setMainAccount(Account mainAccount) {
+    public void setMainAccount(DebitAccount mainAccount) {
         this.mainAccount = mainAccount;
     }
 
     @OneToOne
     @JoinColumn(name = "main_account_id")
-    private Account mainAccount;
+    private DebitAccount mainAccount;
 
     public User() {
         // пустой конструктор нужен для JPA
@@ -152,11 +153,11 @@ public class User {
         this.blocked = blocked;
     }
 
-    public List<Account> getAccounts() {
+    public List<DebitAccount> getAccounts() {
         return accounts;
     }
 
-    public void setAccounts(List<Account> accounts) {
+    public void setAccounts(List<DebitAccount> accounts) {
         this.accounts = accounts;
     }
 }

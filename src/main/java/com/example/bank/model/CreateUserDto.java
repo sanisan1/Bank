@@ -1,8 +1,8 @@
 package com.example.bank.model;
 
+import com.example.bank.model.Account.DebitAccount.DebitAccount;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -44,7 +44,7 @@ public class CreateUserDto {
     private Boolean blocked;
 
 
-    private List<Account> accounts = new ArrayList<>();
+    private List<DebitAccount> accounts = new ArrayList<>();
 
     public CreateUserDto() {
         // пустой конструктор нужен для JPA
@@ -137,11 +137,11 @@ public class CreateUserDto {
         this.blocked = blocked;
     }
 
-    public List<Account> getAccounts() {
+    public List<DebitAccount> getAccounts() {
         return accounts;
     }
 
-    public void setAccounts(List<Account> accounts) {
+    public void setAccounts(List<DebitAccount> accounts) {
         this.accounts = accounts;
     }
 }

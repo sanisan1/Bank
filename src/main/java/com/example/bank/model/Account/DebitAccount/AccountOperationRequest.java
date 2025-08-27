@@ -1,4 +1,4 @@
-package com.example.bank.model;
+package com.example.bank.model.Account.DebitAccount;
 
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;

@@ -1,5 +1,6 @@
 package com.example.bank.model;
 
+import com.example.bank.model.Account.DebitAccount.DebitAccount;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -15,7 +16,7 @@ public class Transaction {
 
     @ManyToOne
     @JoinColumn(name = "fromAccountId")
-    private Account fromAccount;
+    private DebitAccount fromAccount;
 
     @ManyToOne
     @JoinColumn(name = "fromUser")
@@ -23,7 +24,7 @@ public class Transaction {
 
     @ManyToOne
     @JoinColumn(name = "toAccountId")
-    private Account toAccount;
+    private DebitAccount toAccount;
 
     @ManyToOne
     @JoinColumn(name = "toUser")
@@ -39,7 +40,7 @@ public class Transaction {
     private OperationType operationType;
 
 
-    public Transaction(BigDecimal amount, User toUser, Account toAccount, LocalDateTime timestamp, Long id, User fromUser, Account fromAccount, String comment, OperationType operationType) {
+    public Transaction(BigDecimal amount, User toUser, DebitAccount toAccount, LocalDateTime timestamp, Long id, User fromUser, DebitAccount fromAccount, String comment, OperationType operationType) {
         this.amount = amount;
         this.toUser = toUser;
         this.toAccount = toAccount;
@@ -78,11 +79,11 @@ public class Transaction {
         this.fromUser = fromUser;
     }
 
-    public Account getFromAccount() {
+    public DebitAccount getFromAccount() {
         return fromAccount;
     }
 
-    public void setFromAccount(Account fromAccount) {
+    public void setFromAccount(DebitAccount fromAccount) {
         this.fromAccount = fromAccount;
     }
 
@@ -102,11 +103,11 @@ public class Transaction {
         this.timestamp = timestamp;
     }
 
-    public Account getToAccount() {
+    public DebitAccount getToAccount() {
         return toAccount;
     }
 
-    public void setToAccount(Account toAccount) {
+    public void setToAccount(DebitAccount toAccount) {
         this.toAccount = toAccount;
     }
 

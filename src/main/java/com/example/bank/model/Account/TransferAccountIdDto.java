@@ -1,4 +1,4 @@
-package com.example.bank.model;
+package com.example.bank.model.Account;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
