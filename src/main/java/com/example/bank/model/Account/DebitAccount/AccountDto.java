@@ -1,12 +1,15 @@
 package com.example.bank.model.Account.DebitAccount;
 
+import com.example.bank.model.AccountType;
+import jakarta.validation.constraints.NotNull;
+
 import java.math.BigDecimal;
 
 public class AccountDto {
 
     private String accountNumber;
     private BigDecimal balance;
-    private String accountType;
+    private AccountType accountType;
 
     public String getAccountNumber() {
         return accountNumber;
@@ -16,11 +19,11 @@ public class AccountDto {
         this.accountNumber = accountNumber;
     }
 
-    public String getAccountType() {
+    public AccountType getAccountType() {
         return accountType;
     }
 
-    public void setAccountType(String accountType) {
+    public void setAccountType(AccountType accountType) {
         this.accountType = accountType;
     }
 

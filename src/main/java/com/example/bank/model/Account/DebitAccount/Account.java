@@ -1,6 +1,7 @@
 package com.example.bank.model.Account.DebitAccount;
 
 
+import com.example.bank.model.AccountType;
 import com.example.bank.model.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -11,9 +12,7 @@ import java.math.BigInteger;
 
 @Entity
 @Table(name = "accounts")
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)// все типы аккаунтов в одной таблице
-@DiscriminatorColumn(name = "account_type", discriminatorType = DiscriminatorType.STRING)
-
+@Inheritance(strategy = InheritanceType.JOINED)// все типы аккаунтов в одной таблице
 public abstract class Account {
 
     @Id
@@ -29,8 +28,18 @@ public abstract class Account {
     private User user;
 
     private BigDecimal balance = BigDecimal.ZERO;
-
     protected Boolean blocked = false;
+
+    public void setAccountType(AccountType accountType) {
+        this.accountType = accountType;
+    }
+
+    public AccountType getAccountType() {
+        return accountType;
+    }
+
+    @Enumerated(EnumType.STRING)
+    private AccountType accountType;
 
     public Account(long id, Boolean blocked, BigDecimal balance, User user, String accountNumber) {
         this.id = id;
@@ -83,5 +92,4 @@ public abstract class Account {
         this.accountNumber = accountNumber;
     }
 
-    public abstract String getAccountType();
 }

@@ -7,22 +7,31 @@ import java.math.BigDecimal;
 
 public class TransferAccountIdDto {
 
-    private long fromAccId;
+    private String fromAccountNumber;
     @NotNull
-    private long toAccId;
+    private String toAccountNumber;
     @NotNull
     @Min(10)
     private BigDecimal amount;
     private String comment;
+
     public TransferAccountIdDto() {
 
     }
 
-    public TransferAccountIdDto(BigDecimal amount, long toAccId, long fromAccId, String comment) {
-        this.amount = amount;
-        this.toAccId = toAccId;
-        this.fromAccId = fromAccId;
+    public TransferAccountIdDto(String fromAccountNumber, String comment, BigDecimal amount, String toAccountNumber) {
+        this.fromAccountNumber = fromAccountNumber;
         this.comment = comment;
+        this.amount = amount;
+        this.toAccountNumber = toAccountNumber;
+    }
+
+    public String getFromAccountNumber() {
+        return fromAccountNumber;
+    }
+
+    public void setFromAccountNumber(String fromAccountNumber) {
+        this.fromAccountNumber = fromAccountNumber;
     }
 
     public String getComment() {
@@ -41,19 +50,11 @@ public class TransferAccountIdDto {
         this.amount = amount;
     }
 
-    public long getFromAccId() {
-        return fromAccId;
+    public String getToAccountNumber() {
+        return toAccountNumber;
     }
 
-    public void setFromAccId(long fromAccId) {
-        this.fromAccId = fromAccId;
-    }
-
-    public long getToAccId() {
-        return toAccId;
-    }
-
-    public void setToAccId(long toAccId) {
-        this.toAccId = toAccId;
+    public void setToAccountNumber(String toAccountNumber) {
+        this.toAccountNumber = toAccountNumber;
     }
 }
