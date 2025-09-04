@@ -47,10 +47,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unexpected error: " + ex.getMessage());
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(UserBlockedException.class)
     public ResponseEntity<String> handleUserBlockedException(UserBlockedException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
     }
+    @ExceptionHandler(AccountBlockedException.class)
+    public ResponseEntity<String> handleAccountBlockedException(AccountBlockedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+    }
+
 
 
 }

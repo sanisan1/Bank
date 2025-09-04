@@ -12,7 +12,7 @@ import java.math.BigInteger;
 
 @Entity
 @Table(name = "accounts")
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)// все типы аккаунтов в одной таблице
+@Inheritance(strategy = InheritanceType.JOINED)// все типы аккаунтов в одной таблице
 public abstract class Account {
 
     @Id

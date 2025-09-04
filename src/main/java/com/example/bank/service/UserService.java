@@ -4,7 +4,10 @@ import com.example.bank.exception.ResourceNotFoundException;
 import com.example.bank.mapper.AccountMapper;
 import com.example.bank.mapper.UserMapper;
 import com.example.bank.model.Account.DebitAccount.AccountDto;
+import com.example.bank.model.Account.DebitAccount.DebitAccount;
+import com.example.bank.model.AccountType;
 import com.example.bank.model.CreateUserDto;
+import com.example.bank.model.OperationType;
 import com.example.bank.model.User;
 import com.example.bank.repository.AccountRepository;
 import com.example.bank.repository.UserRepository;
@@ -68,7 +71,7 @@ public class UserService {
     @PreAuthorize("@accountSecurity.isOwner(#account.accountNumber)")
     public AccountDto setMainAccount(String accountNumber) {
         User user = getCurrentUser();
-        user.setMainAccount(accountRepository.findByAccountNumber(accountNumber).
+        user.setMainAccount((DebitAccount) accountRepository.findByAccountNumberAndAccountType(accountNumber, AccountType.DEBIT).
                 orElseThrow(() -> new ResourceNotFoundException("Account", "id", accountNumber)));
         userRepository.save(user);
         return AccountMapper.toDto(user.getMainAccount());

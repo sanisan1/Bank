@@ -6,23 +6,21 @@ import com.example.bank.model.Account.DebitAccount.DebitAccount;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 
 @Entity
-@SecondaryTable(name = "credit_accounts", pkJoinColumns = @PrimaryKeyJoinColumn(name = "account_id"))
+@Table(name = "credit_accounts")
 public class CreditAccount extends Account {
 
-    @Column(table = "credit_accounts")
+
     private BigDecimal creditLimit;
-    @Column(table = "credit_accounts")
     private BigDecimal interestRate;
-    @Column(table = "credit_accounts")
     private BigDecimal minimumPaymentRate = BigDecimal.valueOf(5);
-    @Column(table = "credit_accounts")
     private Integer gracePeriod = 0;
-    @Column(table = "credit_accounts")
     private BigDecimal debt;
-    @Column(table = "credit_accounts")
+    private BigDecimal accruedInterest;
+    private BigDecimal totalDebt;
     private LocalDate paymentDueDate = LocalDate.now().plusMonths(1).withDayOfMonth(1);
 
 
@@ -78,7 +76,43 @@ public class CreditAccount extends Account {
         return creditLimit;
     }
 
+    public BigDecimal getAccruedInterest() {
+        return accruedInterest;
+    }
+    public void setAccruedInterest(BigDecimal accruedInterest) {
+        this.accruedInterest = accruedInterest;
+    }
 
+    public BigDecimal getTotalDebt() {
+        return totalDebt;
+    }
+
+    public void setTotalDebt(BigDecimal totalDebt) {
+        this.totalDebt = totalDebt;
+    }
+
+    public void updateDebt() {
+        BigDecimal calculatedDebt = creditLimit.subtract(getBalance());
+        if (calculatedDebt.compareTo(BigDecimal.ZERO) < 0) {
+            calculatedDebt = BigDecimal.ZERO;
+        }
+        this.debt = calculatedDebt;
+        this.totalDebt = debt.add(accruedInterest);
+    }
+    public void accrueInterest() {
+        if (debt.compareTo(BigDecimal.ZERO) <= 0) {
+            return; // если нет долга, проценты не считаем
+        }
+
+        // месячная ставка = годовая / 12
+        BigDecimal monthlyRate = interestRate.divide(BigDecimal.valueOf(12), 10, RoundingMode.HALF_UP);
+
+        // проценты за месяц
+        BigDecimal interest = debt.multiply(monthlyRate).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+
+        this.accruedInterest = this.accruedInterest.add(interest);
+        this.totalDebt = debt.add(accruedInterest);
+    }
 
 
 }

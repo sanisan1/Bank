@@ -1,5 +1,6 @@
 package com.example.bank.model.Transaction;
 
+import com.example.bank.model.Account.DebitAccount.Account;
 import com.example.bank.model.Account.DebitAccount.DebitAccount;
 import com.example.bank.model.OperationType;
 import com.example.bank.model.User;
@@ -14,7 +15,7 @@ public class Transfers extends Transaction {
 
     @ManyToOne
     @JoinColumn(name = "from_account_id")
-    private DebitAccount fromAccount;
+    private Account fromAccount;
 
     @ManyToOne
     @JoinColumn(name = "from_user_id")
@@ -22,7 +23,7 @@ public class Transfers extends Transaction {
 
     @ManyToOne
     @JoinColumn(name = "to_account_id")
-    private DebitAccount toAccount;
+    private Account toAccount;
 
     @ManyToOne
     @JoinColumn(name = "to_user_id")
@@ -46,14 +47,14 @@ public class Transfers extends Transaction {
     }
 
     // Геттеры и сеттеры
-    public DebitAccount getFromAccount() { return fromAccount; }
-    public void setFromAccount(DebitAccount fromAccount) { this.fromAccount = fromAccount; }
+    public Account getFromAccount() { return fromAccount; }
+    public void setFromAccount(Account fromAccount) { this.fromAccount = fromAccount; }
 
     public User getFromUser() { return fromUser; }
     public void setFromUser(User fromUser) { this.fromUser = fromUser; }
 
-    public DebitAccount getToAccount() { return toAccount; }
-    public void setToAccount(DebitAccount toAccount) { this.toAccount = toAccount; }
+    public Account getToAccount() { return toAccount; }
+    public void setToAccount(Account toAccount) { this.toAccount = toAccount; }
 
     public User getToUser() { return toUser; }
     public void setToUser(User toUser) { this.toUser = toUser; }
