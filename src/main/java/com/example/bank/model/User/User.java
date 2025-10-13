@@ -1,32 +1,54 @@
-package com.example.bank.model;
+package com.example.bank.model.User;
 
 import com.example.bank.model.Account.DebitAccount.DebitAccount;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
+import com.example.bank.Enums.Role;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-
-public class CreateUserDto {
+@Entity
+@Table(name = "users")
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
-    @NotBlank
+    @Column(unique = true, nullable = false)
     private String username;
 
-    @NotBlank
+    @Column(nullable = false)
+    @JsonIgnore
     private String password;
-    @Email
+
     private String email;
-    @NotBlank
     private String firstName;
-    @NotBlank
     private String lastName;
-    @NotBlank
     private String phoneNumber;
 
-    public  Role getRole() {
+
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
+    private Role role;
+
+    @Column(nullable = false)
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    private Boolean blocked;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<DebitAccount> accounts = new ArrayList<>();
+
+    public DebitAccount getMainAccount() {
+        return mainAccount;
+    }
+    public Role getRole() {
         return role;
     }
 
@@ -34,24 +56,20 @@ public class CreateUserDto {
         this.role = role;
     }
 
+    public void setMainAccount(DebitAccount mainAccount) {
+        this.mainAccount = mainAccount;
+    }
 
-    private Role role;
+    @OneToOne
+    @JoinColumn(name = "main_account_id")
+    private DebitAccount mainAccount;
 
-
-
-    private LocalDateTime createdAt;
-
-    private Boolean blocked;
-
-
-    private List<DebitAccount> accounts = new ArrayList<>();
-
-    public CreateUserDto() {
+    public User() {
         // пустой конструктор нужен для JPA
     }
 
     // Конструктор для удобства (без ролей, так как в вашем коде роли не используются)
-    public CreateUserDto(Long userId, Boolean blocked, LocalDateTime createdAt, String phoneNumber, String lastName, String firstName, String email, String password, String username, Role role) {
+    public User(Long userId, Boolean blocked, LocalDateTime createdAt, String phoneNumber, String lastName, String firstName, String email, String password, String username, Role role) {
         this.userId = userId;
         this.blocked = blocked != null ? blocked : false; // если null, ставим false
         this.createdAt = createdAt;

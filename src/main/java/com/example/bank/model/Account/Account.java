@@ -1,13 +1,12 @@
-package com.example.bank.model.Account.DebitAccount;
+package com.example.bank.model.Account;
 
 
 import com.example.bank.model.AccountType;
-import com.example.bank.model.User;
+import com.example.bank.model.User.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 
 
 @Entity

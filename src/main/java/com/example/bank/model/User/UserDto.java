@@ -1,6 +1,7 @@
-package com.example.bank.model;
+package com.example.bank.model.User;
 
 import com.example.bank.model.Account.DebitAccount.DebitAccount;
+import com.example.bank.Enums.Role;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

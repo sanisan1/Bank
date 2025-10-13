@@ -1,11 +1,11 @@
-package com.example.bank.model.Account;
+package com.example.bank.model.Account.CreditAccount;
 
-import com.example.bank.model.Account.DebitAccount.AccountDto;
+import com.example.bank.model.Account.AccountDto;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 

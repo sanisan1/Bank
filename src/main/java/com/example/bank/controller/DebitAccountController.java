@@ -1,0 +1,35 @@
+package com.example.bank.controller;
+
+import com.example.bank.model.Account.DebitAccount.*;
+import com.example.bank.service.DebitAccountService;
+import com.example.bank.service.UserService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/debit-accounts")
+public class DebitAccountController {
+
+    private final DebitAccountService debitAccountService;
+    private final UserService userService;
+
+    public DebitAccountController(DebitAccountService debitAccountService, UserService userService) {
+        this.debitAccountService = debitAccountService;
+        this.userService = userService;
+    }
+
+    // ✅ Создание аккаунта
+    @PostMapping
+    public ResponseEntity<DebitAccountResponse> createAccount() {
+        DebitAccountResponse created = debitAccountService.createAccount();
+        return ResponseEntity.status(201).body(created);
+    }
+
+
+    // ✅ Удаление аккаунта
+    @DeleteMapping("/{accountNumber}")
+    public ResponseEntity<Void> deleteAccount(@PathVariable String accountNumber) {
+        debitAccountService.deleteAccount(accountNumber);
+        return ResponseEntity.noContent().build();
+    }
+}

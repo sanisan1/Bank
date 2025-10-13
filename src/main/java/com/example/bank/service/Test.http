@@ -1,0 +1,140 @@
+### Регистрация пользователя
+POST http://localhost:8080/register
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "password": "password123",
+  "email": "test@example.com",
+  "firstName": "Test",
+  "lastName": "User",
+  "phoneNumber": "+1234567890"
+}
+
+### Аутентификация обычного пользователя
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "password": "password123"
+}
+
+> {%
+client.global.set("user_token", response.body.token);
+%}
+
+### Аутентификация администратора
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin123"
+}
+
+
+
+### Создание первого дебетового счета
+POST http://localhost:8080/api/debit-accounts
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc2MzE1NjAyOSwiZXhwIjoxNzYzMTU5NjI5fQ.O4425WRU-ViEPpoVXM6YKfO7r8tfolzWN1-yqsmQVJY
+Content-Type: application/json
+
+{
+  "balance": 0
+}
+
+> {%
+client.global.set("account_number_1", response.body.accountNumber);
+%}
+
+### Создание второго дебетового счета
+POST http://localhost:8080/api/debit-accounts
+Authorization: Bearer {{user_token}}
+Content-Type: application/json
+
+{
+  "balance": 0
+}
+
+> {%
+client.global.set("account_number_2", response.body.accountNumber);
+%}
+
+### Создание кредитного счета (только админ)
+POST http://localhost:8080/api/credit-accounts/create
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc2MjcxNDM3NCwiZXhwIjoxNzYyNzE3OTc0fQ.Ixu3037EnzcSI9uiz0qtFnJ2Z_TIXvs4TVEF1ClWZWY
+Content-Type: application/json
+
+{
+  "userID": 3,
+  "creditLimit": 5000.00,
+  "interestRate": 5.5,
+  "gracePeriod": 30
+}
+
+
+
+### Пополнение первого счета
+POST http://localhost:8080/api/transactions/deposit
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc2MjcxNDMwNCwiZXhwIjoxNzYyNzE3OTA0fQ.-Py7_UTSaOUNpAggxyETTOOdbZCDkg6SS4pxmp0zBxA
+Content-Type: application/json
+
+{
+  "accountNumber": "8049968259",
+  "amount": 500,
+  "comment": "Пополнение"
+}
+
+### Перевод между счетами
+POST http://localhost:8080/api/transactions/transfer
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc2MjcxNDMwNCwiZXhwIjoxNzYyNzE3OTA0fQ.-Py7_UTSaOUNpAggxyETTOOdbZCDkg6SS4pxmp0zBxA
+Content-Type: application/json
+
+{
+  "fromAccount": "8049968259",
+  "toAccount": "4724118063",
+  "amount": 250,
+  "comment": "Перевод"
+}
+
+### Снятие средств
+POST http://localhost:8080/api/transactions/withdraw
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc2MjcxNDMwNCwiZXhwIjoxNzYyNzE3OTA0fQ.-Py7_UTSaOUNpAggxyETTOOdbZCDkg6SS4pxmp0zBxA
+Content-Type: application/json
+
+{
+  "accountNumber": "4724118063",
+  "amount": 100,
+  "comment": "Снятие"
+}
+
+### Увеличение кредитного лимита (только админ)
+PUT http://localhost:8080/api/credit-accounts/{{credit_account_number}}/increase-limit?newLimit=6000.00
+Authorization: Bearer {{admin_token}}
+
+### Уменьшение кредитного лимита (только админ)
+PUT http://localhost:8080/api/credit-accounts/{{credit_account_number}}/decrease-limit?newLimit=5500.00
+Authorization: Bearer {{admin_token}}
+
+### Установка процентной ставки (только админ)
+PUT http://localhost:8080/api/credit-accounts/{{credit_account_number}}/set-interest?newRate=6.5
+Authorization: Bearer {{admin_token}}
+
+### Удаление кредитного счета (только админ)
+DELETE http://localhost:8080/api/credit-accounts/{{credit_account_number}}
+Authorization: Bearer {{admin_token}}
+
+### Удаление дебетового счета
+DELETE http://localhost:8080/api/debit-accounts/{{account_number_1}}
+Authorization: Bearer {{user_token}}
+
+### asdasd
+POST http://localhost:8080/api/credit-accounts/accrue-interest
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc2MjcxNDE3MiwiZXhwIjoxNzYyNzE3NzcyfQ.Ukqwwvpya5IXEtoQ5-iiVE0OdZHpyS2hxyLWfsOYT5E
+
+### asd
+GET http://localhost:8080/api/transactions/getAll
+Authorization: Bearer yJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc2Mjk1MzI5MiwiZXhwIjoxNzYyOTU2ODkyfQ.y1jwpa-GK_aW9N9YDnXCi4YT4zaGtiJ-ezcHtxbssA0
+
+
