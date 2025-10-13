@@ -1,7 +1,7 @@
 package com.example.bank.service;
 
 import com.example.bank.exception.ResourceNotFoundException;
-import com.example.bank.model.User;
+import com.example.bank.model.User.User;
 import com.example.bank.repository.UserRepository;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;

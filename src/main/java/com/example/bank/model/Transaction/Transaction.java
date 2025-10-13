@@ -1,6 +1,6 @@
 package com.example.bank.model.Transaction;
 
-import com.example.bank.model.OperationType;
+import com.example.bank.Enums.OperationType;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

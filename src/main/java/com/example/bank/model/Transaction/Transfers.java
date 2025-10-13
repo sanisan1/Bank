@@ -1,9 +1,9 @@
 package com.example.bank.model.Transaction;
 
-import com.example.bank.model.Account.DebitAccount.Account;
+import com.example.bank.model.Account.Account;
 import com.example.bank.model.Account.DebitAccount.DebitAccount;
-import com.example.bank.model.OperationType;
-import com.example.bank.model.User;
+import com.example.bank.Enums.OperationType;
+import com.example.bank.model.User.User;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;

@@ -32,12 +32,18 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/api/account/**").authenticated()
-                        .requestMatchers("/auth/**", "/register").permitAll()
+                        .requestMatchers(
+                            "/auth/**", 
+                            "/register",
+                            // -- Swagger UI v3 (OpenAPI)
+                            "/v3/api-docs/**",
+                            "/swagger-ui/**"
+                        ).permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/account/**", "/api/debit-accounts/**", "/api/credit-accounts/**").authenticated()
+
                         .anyRequest().authenticated()
                 )
-
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class); // ✅ подключаем JwtFilter
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

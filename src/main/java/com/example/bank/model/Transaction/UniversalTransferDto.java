@@ -1,4 +1,4 @@
-package com.example.bank.model.Account;
+package com.example.bank.model.Transaction;
 
 public class UniversalTransferDto {
     private long fromUserId;

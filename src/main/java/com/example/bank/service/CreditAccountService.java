@@ -2,13 +2,15 @@ package com.example.bank.service;
 
 import com.example.bank.exception.InvalidOperationException;
 import com.example.bank.exception.ResourceNotFoundException;
-import com.example.bank.mapper.AccountMapper;
+
 import com.example.bank.mapper.CreditAccountMapper;
-import com.example.bank.model.Account.CreditAccount;
-import com.example.bank.model.Account.CreditAccountDto;
-import com.example.bank.model.Account.DebitAccount.Account;
-import com.example.bank.model.Account.DebitAccount.AccountDto;
-import com.example.bank.model.OperationType;
+import com.example.bank.mapper.TransferMapper;
+import com.example.bank.model.Account.CreditAccount.CreditAccount;
+import com.example.bank.model.Account.CreditAccount.CreditAccountResponseDto;
+import com.example.bank.model.Account.Account;
+import com.example.bank.Enums.OperationType;
+import com.example.bank.model.AccountType;
+import com.example.bank.model.Transaction.TransferResponseDto;
 import com.example.bank.model.Transaction.Transfers;
 import com.example.bank.repository.AccountRepository;
 import com.example.bank.repository.CreditAccountRepository;
@@ -60,8 +62,8 @@ public class CreditAccountService extends AbstractAccountService {
     /* ----------------------- CRUD / операции ----------------------- */
 
     @PreAuthorize("hasRole('ADMIN')")
-    public CreditAccountDto createAccount(BigDecimal creditLimit, BigDecimal interestRate, Integer GracePeriod) {
-        var user = getCurrentUser();
+    public CreditAccountResponseDto createAccount(Long userID, BigDecimal creditLimit, BigDecimal interestRate, Integer GracePeriod) {
+        var user = userRepository.findById(userID).orElseThrow(() -> new ResourceNotFoundException("User", "id", userID));
         checkUserBlock(user);
 
         if (creditLimit == null || creditLimit.compareTo(BigDecimal.ZERO) <= 0)
@@ -81,6 +83,7 @@ public class CreditAccountService extends AbstractAccountService {
         acc.setDebt(BigDecimal.ZERO);
         acc.setTotalDebt(BigDecimal.ZERO);
         acc.setPaymentDueDate(LocalDate.now().plusMonths(1).withDayOfMonth(1));
+        acc.setAccountType(AccountType.CREDIT);
 
         CreditAccount saved = creditAccountRepository.save(acc);
         return CreditAccountMapper.toDto(saved);
@@ -101,7 +104,7 @@ public class CreditAccountService extends AbstractAccountService {
     }
 
     @PreAuthorize("@accountSecurity.isOwner(#accountNumber)")
-    public AccountDto deposit(String accountNumber, BigDecimal amount) {
+    public CreditAccountResponseDto deposit(String accountNumber, BigDecimal amount) {
         CreditAccount acc = getByNumber(accountNumber);
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0)
             throw new InvalidOperationException("Amount must be greater than zero");
@@ -133,11 +136,11 @@ public class CreditAccountService extends AbstractAccountService {
         t.setOperationType(OperationType.deposit);
         transactionRepository.save(t);
 
-        return AccountMapper.toDto(acc);
+        return CreditAccountMapper.toDto(acc);
     }
 
     @PreAuthorize("@accountSecurity.isOwner(#accountNumber)")
-    public AccountDto withdraw(String accountNumber, BigDecimal amount) {
+    public CreditAccountResponseDto withdraw(String accountNumber, BigDecimal amount) {
         CreditAccount acc = getByNumber(accountNumber);
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0)
             throw new InvalidOperationException("Amount must be greater than zero");
@@ -158,11 +161,11 @@ public class CreditAccountService extends AbstractAccountService {
         t.setOperationType(OperationType.withdraw);
         transactionRepository.save(t);
 
-        return AccountMapper.toDto(acc);
+        return CreditAccountMapper.toDto(acc);
     }
 
     @Transactional
-    public Transfers transfer(String fromAccNumber, String toAccNumber, BigDecimal amount, String comment) {
+    public TransferResponseDto transfer(String fromAccNumber, String toAccNumber, BigDecimal amount, String comment) {
         CreditAccount from = getByNumber(fromAccNumber);
         Account to = getAccountByNumber(toAccNumber);
 
@@ -194,7 +197,7 @@ public class CreditAccountService extends AbstractAccountService {
         t.setOperationType(OperationType.transfer);
         transactionRepository.save(t);
 
-        return t;
+        return TransferMapper.toDto(t);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -210,8 +213,8 @@ public class CreditAccountService extends AbstractAccountService {
     /* ----------------------- Админские методы ----------------------- */
 
     @PreAuthorize("hasRole('ADMIN')")
-    public CreditAccount increaseCreditLimit(Long accountId, BigDecimal newLimit) {
-        CreditAccount acc = getCreditAccountById(accountId);
+    public CreditAccount increaseCreditLimit(String accountNumber, BigDecimal newLimit) {
+        CreditAccount acc = creditAccountRepository.findByAccountNumber(accountNumber).orElse(null);
         if (newLimit == null || newLimit.compareTo(acc.getCreditLimit()) <= 0)
             throw new InvalidOperationException("New limit must be greater than current limit");
 
@@ -224,8 +227,8 @@ public class CreditAccountService extends AbstractAccountService {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    public CreditAccount decreaseCreditLimit(Long accountId, BigDecimal newLimit) {
-        CreditAccount acc = getCreditAccountById(accountId);
+    public CreditAccount decreaseCreditLimit(String accountNumber, BigDecimal newLimit) {
+        CreditAccount acc = creditAccountRepository.findByAccountNumber(accountNumber).orElse(null);
         if (newLimit == null || newLimit.compareTo(BigDecimal.ZERO) <= 0)
             throw new InvalidOperationException("New limit must be > 0");
         if (newLimit.compareTo(acc.getBalance()) < 0)

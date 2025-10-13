@@ -1,11 +1,13 @@
 package com.example.bank.service;
 
 import com.example.bank.exception.InvalidOperationException;
-import com.example.bank.mapper.AccountMapper;
-import com.example.bank.model.Account.DebitAccount.AccountDto;
+import com.example.bank.mapper.DebitAccountMapper;
+import com.example.bank.mapper.TransferMapper;
 import com.example.bank.model.Account.DebitAccount.DebitAccount;
+import com.example.bank.model.Account.DebitAccount.DebitAccountResponse;
+import com.example.bank.model.Transaction.TransferResponseDto;
 import com.example.bank.model.Transaction.Transfers;
-import com.example.bank.model.OperationType;
+import com.example.bank.Enums.OperationType;
 import com.example.bank.repository.AccountRepository;
 import com.example.bank.repository.TransactionRepository;
 import com.example.bank.repository.UserRepository;
@@ -15,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @Service
 public class DebitAccountService extends AbstractAccountService {
@@ -31,7 +32,7 @@ public class DebitAccountService extends AbstractAccountService {
     }
 
     @Transactional
-    public DebitAccount createAccount() {
+    public DebitAccountResponse createAccount() {
         var user = getCurrentUser();
         checkUserBlock(user);
 
@@ -41,16 +42,17 @@ public class DebitAccountService extends AbstractAccountService {
 
         DebitAccount saved = (DebitAccount) accountRepository.save(account);
 
+
         if (user.getMainAccount() == null) {
             user.setMainAccount(saved);
             userRepository.save(user);
         }
 
-        return saved;
+        return DebitAccountMapper.toDto(saved);
     }
 
     @PreAuthorize("@accountSecurity.isOwner(#accountNumber)")
-    public AccountDto deposit(String accountNumber, BigDecimal amount) {
+    public DebitAccountResponse deposit(String accountNumber, BigDecimal amount) {
         DebitAccount account = (DebitAccount) getAccountByNumber(accountNumber);
 
         if (amount.compareTo(BigDecimal.ZERO) <= 0)
@@ -66,13 +68,12 @@ public class DebitAccountService extends AbstractAccountService {
         t.setOperationType(OperationType.deposit);
         transactionRepository.save(t);
 
-        return AccountMapper.toDto(account);
+        return DebitAccountMapper.toDto(account);
     }
 
     @PreAuthorize("@accountSecurity.isOwner(#accountNumber)")
-    public AccountDto withdraw(String accountNumber, BigDecimal amount) {
+    public DebitAccountResponse withdraw(String accountNumber, BigDecimal amount) {
         DebitAccount account = (DebitAccount) getAccountByNumber(accountNumber);
-        checkAccountBlock(account);
         if (amount.compareTo(BigDecimal.ZERO) <= 0)
             throw new InvalidOperationException("Amount must be greater than zero");
 
@@ -85,14 +86,16 @@ public class DebitAccountService extends AbstractAccountService {
         account.setBalance(account.getBalance().subtract(amount));
         accountRepository.save(account);
 
-        return AccountMapper.toDto(account);
+        return DebitAccountMapper.toDto(account);
     }
 
     @Transactional
-    public void deleteByAccountNumber(String accountNumber) {
+    public void deleteAccount(String accountNumber) {
+
         var user = getCurrentUser();
         DebitAccount account = (DebitAccount) getAccountByNumber(accountNumber);
-
+        checkAccountBlock(account);
+        checkUserBlock(user);
         if (user.getMainAccount().getAccountNumber().equals(accountNumber))
             throw new InvalidOperationException("Cannot delete main account");
 
@@ -103,12 +106,13 @@ public class DebitAccountService extends AbstractAccountService {
     }
 
     @Transactional
-    public Transfers transfer(String fromAcc, String toAcc, BigDecimal amount, String comment) {
+    public TransferResponseDto transfer(String fromAcc, String toAcc, BigDecimal amount, String comment) {
         var user = getCurrentUser();
 
         DebitAccount from = fromAcc == null ? (DebitAccount) user.getMainAccount() : (DebitAccount) getAccountByNumber(fromAcc);
         DebitAccount to = (DebitAccount) getAccountByNumber(toAcc);
         checkAccountBlock(from);
+        checkUserBlock(user);
 
         if (!accountSecurity.isOwner(from.getId()))
             throw new InvalidOperationException("Not owner account");
@@ -137,8 +141,8 @@ public class DebitAccountService extends AbstractAccountService {
         t.setToUser(to.getUser());
         t.setOperationType(OperationType.transfer);
         transactionRepository.save(t);
-
-        return t;
+        TransferResponseDto responseDto = TransferMapper.toDto(t);
+        return responseDto;
     }
 
 //    public List<DebitAccount> findByUserId(Long userId) {

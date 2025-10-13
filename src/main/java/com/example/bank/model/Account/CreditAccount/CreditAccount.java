@@ -1,8 +1,7 @@
-package com.example.bank.model.Account;
+package com.example.bank.model.Account.CreditAccount;
 
 
-import com.example.bank.model.Account.DebitAccount.Account;
-import com.example.bank.model.Account.DebitAccount.DebitAccount;
+import com.example.bank.model.Account.Account;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;

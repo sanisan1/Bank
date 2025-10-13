@@ -3,9 +3,9 @@ package com.example.bank.service;
 import com.example.bank.exception.AccountBlockedException;
 import com.example.bank.exception.ResourceNotFoundException;
 import com.example.bank.exception.UserBlockedException;
-import com.example.bank.model.Account.DebitAccount.Account;
-import com.example.bank.model.Role;
-import com.example.bank.model.User;
+import com.example.bank.model.Account.Account;
+import com.example.bank.Enums.Role;
+import com.example.bank.model.User.User;
 import com.example.bank.repository.AccountRepository;
 import com.example.bank.repository.UserRepository;
 import com.example.bank.security.AccountSecurity;
@@ -47,7 +47,7 @@ public abstract class AbstractAccountService {
         if (Boolean.TRUE.equals(user.getBlocked())) throw new UserBlockedException(user);
     }
     protected void checkAccountBlock(Account account) {
-        if (account == null) throw new IllegalArgumentException("User cannot be null");
+        if (account == null) throw new IllegalArgumentException("Account cannot be null");
         if (Boolean.TRUE.equals(account.getBlocked())) throw new AccountBlockedException(account);
     }
 
@@ -89,16 +89,16 @@ public abstract class AbstractAccountService {
     //админские методы
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
-    public Account blockAccount(Long accountId) {
-        Account account = getAccountById(accountId);
+    public Account blockAccount(String accountNumber) {
+        Account account = getAccountByAccountNumber(accountNumber);
         account.setBlocked(true);
         return accountRepository.save(account);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
-    public Account unblockAccount(Long accountId) {
-        Account account = getAccountById(accountId);
+    public Account unblockAccount(String accountNumber) {
+        Account account = getAccountByAccountNumber(accountNumber);
         account.setBlocked(false);
         return accountRepository.save(account);
     }
@@ -106,6 +106,11 @@ public abstract class AbstractAccountService {
     protected Account getAccountById(Long accountId) {
         return accountRepository.findById(accountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Account", "id", accountId));
+    }
+
+    protected Account getAccountByAccountNumber(String accountNumber) {
+        return accountRepository.findByAccountNumber(accountNumber)
+                .orElseThrow(() -> new ResourceNotFoundException("Account", "accountNumber", accountNumber));
     }
 
 }
