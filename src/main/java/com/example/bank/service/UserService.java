@@ -10,6 +10,8 @@ import com.example.bank.model.User.CreateUserDto;
 import com.example.bank.model.User.User;
 import com.example.bank.repository.AccountRepository;
 import com.example.bank.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -21,10 +23,12 @@ import java.util.List;
 
 @Service
 public class UserService {
+
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AccountRepository accountRepository;
-
 
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AccountRepository accountRepository) {
         this.userRepository = userRepository;
@@ -33,58 +37,112 @@ public class UserService {
     }
 
     public User createUser(CreateUserDto createUserDto) {
+        log.info("Creating new user: username={}", createUserDto.getUsername());
+
         if (createUserDto.getBlocked() == null) {
             createUserDto.setBlocked(false);
         }
 
         User user = UserMapper.toEntity(createUserDto);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
+
+        User savedUser = userRepository.save(user);
+
+        log.info("User created successfully: userId={}, username={}, blocked={}",
+                savedUser.getUserId(), savedUser.getUsername(), savedUser.getBlocked());
+
+        return savedUser;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public List<User> getAllUsers() {
-        return userRepository.findAll();
+        log.debug("Admin requested all users list");
+
+        List<User> users = userRepository.findAll();
+
+        log.debug("Retrieved {} users", users.size());
+        return users;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public User getUserById(Long id) {
+        log.debug("Admin requested user by id: {}", id);
+
         return userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+                .orElseThrow(() -> {
+                    log.warn("User not found: id={}", id);
+                    return new ResourceNotFoundException("User", "id", id);
+                });
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteUserById(Long id) {
+        log.info("Admin attempting to delete user: id={}", id);
+
         if (!userRepository.existsById(id)) {
+            log.warn("Cannot delete user - not found: id={}", id);
             throw new ResourceNotFoundException("User", "id", id);
         }
+
         userRepository.deleteById(id);
+        log.info("User deleted successfully: id={}", id);
     }
 
     public User update(User user) {
+        log.info("Updating user: userId={}, username={}",
+                user.getUserId(), user.getUsername());
+
         if (!userRepository.existsById(user.getUserId())) {
+            log.warn("Cannot update user - not found: userId={}", user.getUserId());
             throw new ResourceNotFoundException("User", "id", user.getUserId());
         }
+
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
+        User updatedUser = userRepository.save(user);
+
+        log.info("User updated successfully: userId={}", updatedUser.getUserId());
+        return updatedUser;
     }
 
-    @PreAuthorize("@accountSecurity.isOwner(#account.accountNumber)")
+    @PreAuthorize("@accountSecurity.isOwner(#accountNumber)")
     public AccountDto setMainAccount(String accountNumber) {
-        User user = getCurrentUser();
-        user.setMainAccount((DebitAccount) accountRepository.findByAccountNumberAndAccountType(accountNumber, AccountType.DEBIT).
-                orElseThrow(() -> new ResourceNotFoundException("Account", "id", accountNumber)));
-        userRepository.save(user);
-        return AccountMapper.toDto(user.getMainAccount());
+        log.info("User attempting to set main account: accountNumber={}", accountNumber);
 
+        User user = getCurrentUser();
+
+        DebitAccount account = (DebitAccount) accountRepository
+                .findByAccountNumberAndAccountType(accountNumber, AccountType.DEBIT)
+                .orElseThrow(() -> {
+                    log.warn("Account not found when setting main account: accountNumber={}, userId={}",
+                            accountNumber, user.getUserId());
+                    return new ResourceNotFoundException("Account", "id", accountNumber);
+                });
+
+        user.setMainAccount(account);
+        userRepository.save(user);
+
+        log.info("Main account set successfully: userId={}, accountNumber={}",
+                user.getUserId(), accountNumber);
+
+        return AccountMapper.toDto(user.getMainAccount());
     }
 
     private User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
+
+        if (authentication == null || !authentication.isAuthenticated()
+                || authentication.getPrincipal().equals("anonymousUser")) {
+            log.warn("Unauthorized access attempt - user not authenticated");
             throw new AccessDeniedException("User is not authenticated");
         }
-        String username = authentication.getName();
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
-        return user;
 
+        String username = authentication.getName();
+        log.debug("Retrieving current user: username={}", username);
+
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> {
+                    log.error("Authenticated user not found in database: username={}", username);
+                    return new ResourceNotFoundException("User", "username", username);
+                });
     }
 }

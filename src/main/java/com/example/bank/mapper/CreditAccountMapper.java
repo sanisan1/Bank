@@ -18,7 +18,7 @@ public class CreditAccountMapper {
                 creditAccount.getInterestRate(),
                 creditAccount.getMinimumPaymentRate(),
                 creditAccount.getGracePeriod(),
-                creditAccount.getTotalDebt(), // долг
+                creditAccount.getDebt(), // долг
                 creditAccount.getPaymentDueDate()
         );
     }

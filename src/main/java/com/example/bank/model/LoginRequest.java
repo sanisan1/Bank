@@ -1,7 +1,7 @@
 package com.example.bank.model;
 
-public class LoginRequset {
-    public LoginRequset(String password, String username) {
+public class LoginRequest {
+    public LoginRequest(String password, String username) {
         this.password = password;
         this.username = username;
     }
@@ -9,7 +9,7 @@ public class LoginRequset {
     private String username;
     private String password;
 
-    public LoginRequset() {
+    public LoginRequest() {
 
     }
     public String getPassword() {
