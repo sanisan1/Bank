@@ -7,18 +7,13 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 public class TransferRequest {
-
-    @NotBlank(message = "From account is required")
-    private String fromAccount;
-
-    @NotBlank(message = "To account is required")
-    private String toAccount;
-
-    @NotNull(message = "Amount is required")
+    @NotBlank
+    String fromAccount;
+    @NotBlank
+    String toAccount;
     @DecimalMin(value = "0.01", message = "Amount must be greater than zero")
-    private BigDecimal amount;
-
-    private String comment;
+    BigDecimal amount;
+    String comment;
 
     public String getFromAccount() {
         return fromAccount;

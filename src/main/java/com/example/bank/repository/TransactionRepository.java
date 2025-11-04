@@ -1,9 +1,15 @@
 package com.example.bank.repository;
 
-import com.example.bank.model.Transaction.Transfers;
+
+import com.example.bank.model.Transaction.Transaction;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
-public interface TransactionRepository extends JpaRepository<Transfers, Long> {
+public interface TransactionRepository extends JpaRepository<Transaction, Long> {
+
+    List<Transaction> findByFromAccountOrToAccount(String fromAccount, String toAccount);
+    List<Transaction> findByFromAccountInOrToAccountIn(List<String> fromAccounts, List<String> toAccounts);
 }

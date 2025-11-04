@@ -1,6 +1,6 @@
 package com.example.bank.controller;
 
-import com.example.bank.model.LoginRequset;
+import com.example.bank.model.LoginRequest;
 import com.example.bank.security.JwtUtil;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,9 +21,9 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody LoginRequset loginRequset) {
-        String username = loginRequset.getUsername();
-        String password = loginRequset.getPassword();
+    public String login(@RequestBody LoginRequest loginRequest) {
+        String username = loginRequest.getUsername();
+        String password = loginRequest.getPassword();
         try {
             Authentication authentication = authManager.authenticate(
                     new UsernamePasswordAuthenticationToken(username, password)

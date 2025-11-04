@@ -4,9 +4,6 @@ import com.example.bank.model.Account.*;
 import com.example.bank.model.Account.CreditAccount.CreditAccount;
 import com.example.bank.model.Account.CreditAccount.CreditAccountCreateRequest;
 import com.example.bank.model.Account.CreditAccount.CreditAccountResponseDto;
-import com.example.bank.model.Transaction.TransferRequest;
-import com.example.bank.model.Transaction.TransferResponseDto;
-import com.example.bank.model.Transaction.Transfers;
 import com.example.bank.service.CreditAccountService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;
@@ -46,28 +43,7 @@ public class CreditAccountController {
 
     /* ----------------------- Операции с аккаунтом ----------------------- */
 
-    @PostMapping("/deposit")
-    public ResponseEntity<CreditAccountResponseDto> deposit(@Valid @RequestBody AccountOperationRequest request) {
-        CreditAccountResponseDto response = creditAccountService.deposit(request.getAccountNumber(), request.getAmount());
-        return ResponseEntity.ok(response);
-    }
 
-    @PostMapping("/withdraw")
-    public ResponseEntity<CreditAccountResponseDto> withdraw(@Valid @RequestBody AccountOperationRequest request) {
-        CreditAccountResponseDto response = creditAccountService.withdraw(request.getAccountNumber(), request.getAmount());
-        return ResponseEntity.ok(response);
-    }
-
-    @PostMapping("/transfer")
-    public ResponseEntity<TransferResponseDto> transfer(@Valid @RequestBody TransferRequest request) {
-        TransferResponseDto response = creditAccountService.transfer(
-                request.getFromAccount(),
-                request.getToAccount(),
-                request.getAmount(),
-                request.getComment()
-        );
-        return ResponseEntity.ok(response);
-    }
 
     @DeleteMapping("/{accountNumber}")
     @PreAuthorize("hasRole('ADMIN')")
@@ -103,10 +79,17 @@ public class CreditAccountController {
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{accountId}/set-interest")
     public ResponseEntity<CreditAccount> setInterestRate(
-            @PathVariable Long accountId,
+            @PathVariable String accountNumber,
             @RequestParam @NotNull @DecimalMin("0.0") BigDecimal newRate
     ) {
-        CreditAccount account = creditAccountService.setInterestRate(accountId, newRate);
+        CreditAccount account = creditAccountService.setInterestRate(accountNumber, newRate);
         return ResponseEntity.ok(account);
+    }
+
+
+    @PostMapping("/accrue-interest")
+    public ResponseEntity<String> runAccrueInterest() {
+        creditAccountService.accrueMonthlyInterest(); // вызываем метод
+        return ResponseEntity.ok("Начисление процентов выполнено");
     }
 }
