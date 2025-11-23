@@ -13,5 +13,4 @@ public class AccountDto {
     private BigDecimal balance;
     private AccountType accountType;
 
-
 }
