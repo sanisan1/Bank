@@ -2,12 +2,17 @@ package com.example.bank.model.Account.CreditAccount;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class CreditAccountCreateRequest {
     @NotNull
-    private Long userID;
+    private Long userId;
 
     @NotNull(message = "Credit limit is required")
     @DecimalMin(value = "0.01", message = "Credit limit must be greater than zero")
@@ -20,35 +25,4 @@ public class CreditAccountCreateRequest {
     @NotNull(message = "Grace period is required")
     private Integer gracePeriod;
 
-    public Long getUserID() {
-        return userID;
-    }
-
-    public void setUserID(Long userID) {
-        this.userID = userID;
-    }
-
-    public BigDecimal getCreditLimit() {
-        return creditLimit;
-    }
-
-    public void setCreditLimit(BigDecimal creditLimit) {
-        this.creditLimit = creditLimit;
-    }
-
-    public BigDecimal getInterestRate() {
-        return interestRate;
-    }
-
-    public void setInterestRate(BigDecimal interestRate) {
-        this.interestRate = interestRate;
-    }
-
-    public Integer getGracePeriod() {
-        return gracePeriod;
-    }
-
-    public void setGracePeriod(Integer gracePeriod) {
-        this.gracePeriod = gracePeriod;
-    }
 }

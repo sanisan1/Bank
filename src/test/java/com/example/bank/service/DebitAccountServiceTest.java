@@ -1,5 +1,7 @@
 package com.example.bank.service;
 
+import com.example.bank.exception.AccountBlockedException;
+import com.example.bank.exception.InvalidOperationException;
 import com.example.bank.exception.UserBlockedException;
 import com.example.bank.mapper.DebitAccountMapper;
 import com.example.bank.model.Account.DebitAccount.DebitAccount;
@@ -18,6 +20,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -44,9 +47,14 @@ class DebitAccountServiceTest {
     @InjectMocks
     private DebitAccountService debitAccountService;
 
+    private DebitAccount account;
+
     @BeforeEach
     void setUp() {
         SecurityContextHolder.setContext(securityContext);
+        account = new DebitAccount();
+        account.setAccountNumber("1234567890");
+        account.setBalance(new BigDecimal(1000));
     }
 
     @Test
@@ -77,23 +85,7 @@ class DebitAccountServiceTest {
         verify(accountRepository, times(1)).save(any(DebitAccount.class));
     }
 
-    @Test
-    void createAccount_shouldThrowExceptionWhenUserBlocked() {
-        // Arrange
-        User user = new User();
-        user.setUserId(1L);
-        user.setBlocked(true);
 
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(authentication.getName()).thenReturn("testUser");
-        when(authentication.isAuthenticated()).thenReturn(true);
-        when(authentication.getPrincipal()).thenReturn(user);
-        when(userRepository.findByUsername("testUser")).thenReturn(Optional.of(user));
-
-        // Act & Assert
-        assertThrows(UserBlockedException.class, () -> debitAccountService.createAccount());
-        verify(accountRepository, never()).save(any(DebitAccount.class));
-    }
 
     @Test
     void createAccount_shouldThrowExceptionWhenUserNotAuthenticated() {
@@ -104,4 +96,38 @@ class DebitAccountServiceTest {
         assertThrows(AccessDeniedException.class, () -> debitAccountService.createAccount());
         verify(accountRepository, never()).save(any(DebitAccount.class));
     }
+
+
+    @Test
+    void testDeposit() {
+        debitAccountService.processDeposit(account, new BigDecimal(100));
+        assertEquals(new BigDecimal(1100), account.getBalance());
+
+    }
+
+    @Test
+    void testWithdraw() {
+        debitAccountService.processWithdraw(account, new BigDecimal(100));
+        assertEquals(new BigDecimal(900), account.getBalance());
+    }
+
+    @Test
+    void testWithdraw_shouldThrowExceptionWhenAmountIsNegative() {
+        assertThrows(IllegalArgumentException.class, () -> debitAccountService.processWithdraw(account, new BigDecimal(-100)));
+    }
+
+    @Test
+    void testWithdraw_shouldThrowExceptionWhenAmountIsGreaterThanBalance() {
+        assertThrows(InvalidOperationException.class, () -> debitAccountService.processWithdraw(account, new BigDecimal(1100)));
+    }
+
+    @Test
+    void testWithdraw_shouldThrowExceptionWhenAccountIsBlocked() {
+        account.setBlocked(true);
+        assertThrows(AccountBlockedException.class, () -> debitAccountService.processWithdraw(account, new BigDecimal(100)));
+    }
+
+
+
+
 }

@@ -12,6 +12,7 @@ import com.example.bank.repository.AccountRepository;
 import com.example.bank.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -36,6 +37,7 @@ public class UserService {
         this.accountRepository = accountRepository;
     }
 
+    // Создание нового пользователя
     public User createUser(CreateUserDto createUserDto) {
         log.info("Creating new user: username={}", createUserDto.getUsername());
 
@@ -46,14 +48,20 @@ public class UserService {
         User user = UserMapper.toEntity(createUserDto);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-        User savedUser = userRepository.save(user);
+        try {
+            User savedUser = userRepository.save(user);
+            
+            log.info("User created successfully: userId={}, username={}, blocked={}",
+                    savedUser.getUserId(), savedUser.getUsername(), savedUser.getBlocked());
 
-        log.info("User created successfully: userId={}, username={}, blocked={}",
-                savedUser.getUserId(), savedUser.getUsername(), savedUser.getBlocked());
-
-        return savedUser;
+            return savedUser;
+        } catch (DataIntegrityViolationException e) {
+            log.warn("Failed to create user due to constraint violation: username={}", createUserDto.getUsername());
+            throw new DataIntegrityViolationException("User with this username already exists", e);
+        }
     }
 
+    // Получение списка всех пользователей (только для администратора)
     @PreAuthorize("hasRole('ADMIN')")
     public List<User> getAllUsers() {
         log.debug("Admin requested all users list");
@@ -64,6 +72,7 @@ public class UserService {
         return users;
     }
 
+    // Получение пользователя по ID (только для администратора)
     @PreAuthorize("hasRole('ADMIN')")
     public User getUserById(Long id) {
         log.debug("Admin requested user by id: {}", id);
@@ -75,6 +84,7 @@ public class UserService {
                 });
     }
 
+    // Удаление пользователя по ID (только для администратора)
     @PreAuthorize("hasRole('ADMIN')")
     public void deleteUserById(Long id) {
         log.info("Admin attempting to delete user: id={}", id);
@@ -88,6 +98,7 @@ public class UserService {
         log.info("User deleted successfully: id={}", id);
     }
 
+    // Обновление информации о пользователе
     public User update(User user) {
         log.info("Updating user: userId={}, username={}",
                 user.getUserId(), user.getUsername());
@@ -104,6 +115,7 @@ public class UserService {
         return updatedUser;
     }
 
+    // Установка основного счета пользователя
     @PreAuthorize("@accountSecurity.isOwner(#accountNumber)")
     public AccountDto setMainAccount(String accountNumber) {
         log.info("User attempting to set main account: accountNumber={}", accountNumber);
@@ -127,6 +139,7 @@ public class UserService {
         return AccountMapper.toDto(user.getMainAccount());
     }
 
+    // Получение текущего пользователя из контекста безопасности
     private User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 

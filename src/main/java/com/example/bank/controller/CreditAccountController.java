@@ -26,13 +26,12 @@ public class CreditAccountController {
     }
 
     /* ----------------------- Создание аккаунта (только для админа) ----------------------- */
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/create")
+    @PostMapping("/createforadmin")
     public ResponseEntity<CreditAccountResponseDto> createAccount(
             @Valid @RequestBody CreditAccountCreateRequest request
     ) {
         CreditAccountResponseDto dto = creditAccountService.createAccount(
-                request.getUserID(),
+                request.getUserId(),
                 request.getCreditLimit(),
                 request.getInterestRate(),
                 request.getGracePeriod()
@@ -40,6 +39,14 @@ public class CreditAccountController {
         );
         return new ResponseEntity<>(dto, HttpStatus.CREATED);
     }
+
+    // содание для юзера
+    @PostMapping("/create")
+    public ResponseEntity<CreditAccountResponseDto> createAccountForSelf() {
+        CreditAccountResponseDto dto = creditAccountService.createAccountforUser();
+        return new ResponseEntity<>(dto, HttpStatus.CREATED);
+    }
+
 
     /* ----------------------- Операции с аккаунтом ----------------------- */
 
@@ -56,8 +63,9 @@ public class CreditAccountController {
 
 
 
-    @PreAuthorize("hasRole('ADMIN')")
+
     @PutMapping("/{accountNumber}/increase-limit")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CreditAccount> increaseCreditLimit(
             @PathVariable String accountNumber,
             @RequestParam @NotNull @DecimalMin("0.01") BigDecimal newLimit
@@ -77,7 +85,7 @@ public class CreditAccountController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/{accountId}/set-interest")
+    @PutMapping("/{accountNumber}/set-interest")
     public ResponseEntity<CreditAccount> setInterestRate(
             @PathVariable String accountNumber,
             @RequestParam @NotNull @DecimalMin("0.0") BigDecimal newRate
