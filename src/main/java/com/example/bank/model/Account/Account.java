@@ -5,13 +5,17 @@ import com.example.bank.model.AccountType;
 import com.example.bank.model.User.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
-
+@Data
+@NoArgsConstructor
 @Entity
 @Table(name = "accounts")
-@Inheritance(strategy = InheritanceType.JOINED)// все типы аккаунтов в одной таблице
+@Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Account {
 
     @Id
@@ -24,71 +28,15 @@ public abstract class Account {
     @ManyToOne
     @JoinColumn(name = "user_id")
     @JsonIgnore
+    @NotNull
     private User user;
 
     private BigDecimal balance = BigDecimal.ZERO;
     protected Boolean blocked = false;
 
-    public void setAccountType(AccountType accountType) {
-        this.accountType = accountType;
-    }
-
-    public AccountType getAccountType() {
-        return accountType;
-    }
 
     @Enumerated(EnumType.STRING)
     private AccountType accountType;
 
-    public Account(long id, Boolean blocked, BigDecimal balance, User user, String accountNumber) {
-        this.id = id;
-        this.blocked = blocked;
-        this.balance = balance;
-        this.user = user;
-        this.accountNumber = accountNumber;
-    }
-
-    public Account() {
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public Boolean getBlocked() {
-        return blocked;
-    }
-
-    public void setBlocked(Boolean blocked) {
-        this.blocked = blocked;
-    }
-
-    public BigDecimal getBalance() {
-        return balance;
-    }
-
-    public void setBalance(BigDecimal balance) {
-        this.balance = balance;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public String getAccountNumber() {
-        return accountNumber;
-    }
-
-    public void setAccountNumber(String accountNumber) {
-        this.accountNumber = accountNumber;
-    }
 
 }

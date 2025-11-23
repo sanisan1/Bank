@@ -5,6 +5,7 @@ import com.example.bank.exception.InvalidOperationException;
 import com.example.bank.exception.ResourceNotFoundException;
 import com.example.bank.kafka.TransactionEventProducer;
 import com.example.bank.mapper.AccountMapper;
+import com.example.bank.mapper.EventMapper;
 import com.example.bank.mapper.TransactionMapper;
 import com.example.bank.model.Account.Account;
 import com.example.bank.model.Account.AccountDto;
@@ -16,7 +17,6 @@ import com.example.bank.repository.AccountRepository;
 import com.example.bank.repository.TransactionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,31 +31,36 @@ public class TransactionService {
 
     private static final Logger log = LoggerFactory.getLogger(TransactionService.class);
 
-    @Autowired
-    private TransactionEventProducer eventProducer;
+
+    private final TransactionEventProducer eventProducer;
 
     private final AccountRepository accountRepository;
     private final TransactionRepository transactionRepository;
     private final Map<Class<? extends Account>, AbstractAccountService> serviceMap;
 
+
     public TransactionService(
             AccountRepository accountRepository,
             TransactionRepository transactionRepository,
             CreditAccountService creditAccountService,
-            DebitAccountService debitAccountService) {
+            DebitAccountService debitAccountService,
+            TransactionEventProducer eventProducer   // <---- обязательно!
+          ) {
         this.accountRepository = accountRepository;
         this.transactionRepository = transactionRepository;
+        this.eventProducer = eventProducer;
         this.serviceMap = new HashMap<>();
         this.serviceMap.put(CreditAccount.class, creditAccountService);
         this.serviceMap.put(DebitAccount.class, debitAccountService);
     }
+
 
     private Account getAccountByNumber(String accountNumber) {
         return accountRepository.findByAccountNumber(accountNumber)
                 .orElseThrow(() -> new ResourceNotFoundException("Account not found", "AccountNumber", accountNumber));
     }
 
-    // Deposit operation
+    // Операция пополнения счета
     @Transactional
     @PreAuthorize("@accountSecurity.isOwner(#accountNumber)")
     public AccountDto deposit(String accountNumber, BigDecimal amount, String comment) {
@@ -75,13 +80,10 @@ public class TransactionService {
             transaction.setAmount(amount);
             transaction.setType(OperationType.deposit);
             transaction.setComment(comment);
+            transaction.setUser(acc.getUser());
             transactionRepository.save(transaction);
+            eventProducer.sendTransactionEvent(EventMapper.toEventDTO(transaction));
 
-            // Формируем строку-событие (можно пока просто текст, потом JSON)
-            String eventJson = String.format("WITHDRAW: account=%s, amount=%s", updatedAccount, amount);
-
-            // Отправляем событие в Kafka
-            eventProducer.sendTransactionEvent(eventJson);
 
             return AccountMapper.toDto(updatedAccount);
         } catch (Exception e) {
@@ -90,7 +92,7 @@ public class TransactionService {
         }
     }
 
-    // Withdraw operation
+    // Операция снятия со счета
     @Transactional
     @PreAuthorize("@accountSecurity.isOwner(#accountNumber)")
     public AccountDto withdraw(String accountNumber, BigDecimal amount, String comment) {
@@ -110,7 +112,12 @@ public class TransactionService {
             transaction.setAmount(amount);
             transaction.setType(OperationType.withdraw);
             transaction.setComment(comment);
+            transaction.setUser(acc.getUser());
             transactionRepository.save(transaction);
+
+
+            eventProducer.sendTransactionEvent(EventMapper.toEventDTO(transaction));
+
 
             return AccountMapper.toDto(updatedAccount);
         } catch (Exception e) {
@@ -119,7 +126,7 @@ public class TransactionService {
         }
     }
 
-    // Transfer operation
+    // Операция перевода средств
     @Transactional
     @PreAuthorize("@accountSecurity.isOwner(#fromNumber)")
     public AccountDto transfer(String fromNumber, String toNumber, BigDecimal amount, String comment) {
@@ -144,7 +151,11 @@ public class TransactionService {
             transaction.setAmount(amount);
             transaction.setType(OperationType.transfer);
             transaction.setComment(comment);
+            transaction.setUser(fromAcc.getUser());
             transactionRepository.save(transaction);
+
+            eventProducer.sendTransactionEvent(EventMapper.toEventDTO(transaction));
+
 
             return AccountMapper.toDto(fromAcc);
 
@@ -154,7 +165,7 @@ public class TransactionService {
         }
     }
 
-    // Get transaction by id
+    // Получить транзакцию по ID
     public TransactionDto getTransactionById(Long id) {
         return TransactionMapper.toDto(
                 transactionRepository.findById(id)
@@ -162,7 +173,7 @@ public class TransactionService {
         );
     }
 
-    // Get all transactions (admin)
+    // Получить все транзакции
     @PreAuthorize("hasRole('ADMIN')")
     public List<TransactionDto> getAllTransactions() {
         return transactionRepository.findAll().stream()
@@ -170,7 +181,7 @@ public class TransactionService {
                 .collect(Collectors.toList());
     }
 
-    // Get transactions by account
+    // Получить транзакции по счету
     @PreAuthorize("@accountSecurity.isOwner(#accountNumber)")
     public List<TransactionDto> getTransactionsByAccount(String accountNumber) {
         List<Transaction> transactions = transactionRepository.findByFromAccountOrToAccount(accountNumber, accountNumber);
@@ -179,7 +190,7 @@ public class TransactionService {
                 .collect(Collectors.toList());
     }
 
-    // Get transactions by user
+    // Получить транзакции по пользователю
     @PreAuthorize("@accountSecurity.isSelfOrAdmin(#userId)")
     public List<TransactionDto> getTransactionsByUser(Long userId) {
         List<Account> userAccounts = accountRepository.findByUserUserId(userId);

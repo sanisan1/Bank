@@ -2,6 +2,11 @@ package com.example.bank.model.Account.CreditAccount;
 
 import com.example.bank.model.Account.Account;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -13,100 +18,45 @@ import java.time.LocalDate;
 /**
  ВАЖНО!!!!!!!!!!!!!!!!!!!!!!!!! БАЛАНС У НАС ЭТО ВСЯ СУММА КОТОРУЮ МОЖЕТ ПОТРАТИТЬ ПОЛЬЗОВАТЕЛЬ ТОЕСТЬ КРЕДИТ ЛИМИТ ИЛИ ЕГО ОСТАТОК + ЕСЛИ ЕСТЬ ПЛЮСОВЫЕ ДЕНЬГИ
  **/
+@Data
+@NoArgsConstructor
 @Entity
 @Table(name = "credit_accounts")
 public class CreditAccount extends Account {
 
     // Кредитный лимит счета
+    @NotNull
     private BigDecimal creditLimit;
     
     // Процентная ставка по кредиту (годовая)
+    @NotNull
     private BigDecimal interestRate;
     
     // Минимальный процентный платеж (по умолчанию 5%)
+    @NotNull
     private BigDecimal minimumPaymentRate = BigDecimal.valueOf(5);
     
     // Грейс-период в днях (по умолчанию 0)
+    @NotNull
     private Integer gracePeriod = 0;
     
 
     // Общая сумма задолженности (основной долг + проценты)
+    @NotNull
     private BigDecimal totalDebt = BigDecimal.ZERO;
     
     // Начисленные проценты
+    @NotNull
     private BigDecimal accruedInterest = BigDecimal.ZERO;
 
     // Текущая задолженность по кредиту
+    @NotNull
     private BigDecimal debt = BigDecimal.ZERO;
     
     // Дата следующего платежа (первое число следующего месяца)
+    @NotNull
     private LocalDate paymentDueDate = LocalDate.now().plusMonths(1).withDayOfMonth(1);
 
-    // ==================== Геттеры и сеттеры ====================
-
-    public BigDecimal getInterestRate() {
-        return interestRate;
-    }
-
-    public void setInterestRate(BigDecimal interestRate) {
-        this.interestRate = interestRate;
-    }
-
-    public BigDecimal getMinimumPaymentRate() {
-        return minimumPaymentRate;
-    }
-
-    public void setMinimumPaymentRate(BigDecimal minimumPaymentRate) {
-        this.minimumPaymentRate = minimumPaymentRate;
-    }
-
-    public Integer getGracePeriod() {
-        return gracePeriod;
-    }
-
-    public void setGracePeriod(Integer gracePeriod) {
-        this.gracePeriod = gracePeriod;
-    }
-
-    public BigDecimal getTotalDebt() {
-        return totalDebt;
-    }
-
-    public void setTotalDebt(BigDecimal totalDebt) {
-        this.totalDebt = totalDebt;
-    }
-
-    public LocalDate getPaymentDueDate() {
-        return paymentDueDate;
-    }
-
-    public void setPaymentDueDate(LocalDate paymentDueDate) {
-        this.paymentDueDate = paymentDueDate;
-    }
-
-    public void setCreditLimit(BigDecimal creditLimit) {
-        this.creditLimit = creditLimit;
-    }
-
-    public BigDecimal getCreditLimit() {
-        return creditLimit;
-    }
-
-    public BigDecimal getAccruedInterest() {
-        return accruedInterest;
-    }
-    
-    public void setAccruedInterest(BigDecimal accruedInterest) {
-        this.accruedInterest = accruedInterest;
-    }
-
-    public BigDecimal getDebt() {
-        return debt;
-    }
-
-    public void setDebt(BigDecimal debt) {
-        this.debt = debt;
-    }
 
     // ==================== Бизнес-методы ====================
 

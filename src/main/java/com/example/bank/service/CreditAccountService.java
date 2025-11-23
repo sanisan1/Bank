@@ -7,6 +7,7 @@ import com.example.bank.model.Account.CreditAccount.CreditAccount;
 import com.example.bank.model.Account.CreditAccount.CreditAccountResponseDto;
 import com.example.bank.model.Account.Account;
 import com.example.bank.model.AccountType;
+import com.example.bank.model.User.User;
 import com.example.bank.repository.AccountRepository;
 import com.example.bank.repository.CreditAccountRepository;
 import com.example.bank.repository.TransactionRepository;
@@ -14,6 +15,7 @@ import com.example.bank.repository.UserRepository;
 import com.example.bank.security.AccountSecurity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,15 +25,29 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 
+// Сервис для работы с кредитными счетами
 @Service
-@Transactional
 public class CreditAccountService extends AbstractAccountService {
+    // Базовые значения кредита
+    @Value("${bank.credit.default.interest-rate}")
+    private BigDecimal defaultInterestRate;
+
+    @Value("${bank.credit.default.limit}")
+    private BigDecimal defaultCreditLimit;
+
+    @Value("${bank.credit.default.minimum-payment-rate}")
+    private BigDecimal defaultMinimumPaymentRate;
+
+    @Value("${bank.credit.default.grace-period}")
+    private Integer defaultGracePeriod;
+
 
     private static final Logger log = LoggerFactory.getLogger(CreditAccountService.class);
 
     private final CreditAccountRepository creditAccountRepository;
     private final TransactionRepository transactionRepository;
 
+    // Конструктор сервиса кредитных счетов
     public CreditAccountService(AccountRepository accountRepository,
                                 UserRepository userRepository,
                                 AccountSecurity accountSecurity,
@@ -42,6 +58,7 @@ public class CreditAccountService extends AbstractAccountService {
         this.transactionRepository = transactionRepository;
     }
 
+    // Начисление ежемесячных процентов по всем кредитным счетам
     @Scheduled(cron = "0 0 0 1 * ?")
     public void accrueMonthlyInterest() {
         log.info("Monthly interest accrual started for all credit accounts");
@@ -63,11 +80,12 @@ public class CreditAccountService extends AbstractAccountService {
         log.info("Monthly interest accrual finished for all credit accounts");
     }
 
+    // Создание кредитного счета администратором
     @PreAuthorize("hasRole('ADMIN')")
     public CreditAccountResponseDto createAccount(Long userID, BigDecimal creditLimit, BigDecimal interestRate, Integer gracePeriod) {
         log.info("Creating credit account for userID={} with limit {} and rate {}", userID, creditLimit, interestRate);
         try {
-            var user = userRepository.findById(userID)
+            User user = userRepository.findById(userID)
                     .orElseThrow(() -> {
                         log.error("User not found with id={}", userID);
                         return new ResourceNotFoundException("User", "id", userID);
@@ -86,9 +104,9 @@ public class CreditAccountService extends AbstractAccountService {
             acc.setUser(user);
             acc.setAccountNumber(generateUniqueAccountNumber());
             acc.setCreditLimit(creditLimit);
-            acc.setBalance(creditLimit);
+            acc.setBalance(acc.getCreditLimit());
             acc.setInterestRate(interestRate);
-            acc.setMinimumPaymentRate(BigDecimal.valueOf(5));
+            acc.setMinimumPaymentRate(BigDecimal.valueOf(5)); // Значение по умолчанию
             acc.setGracePeriod(gracePeriod);
             acc.setAccruedInterest(BigDecimal.ZERO);
             acc.setAccountType(AccountType.CREDIT);
@@ -102,6 +120,38 @@ public class CreditAccountService extends AbstractAccountService {
         }
     }
 
+    // Создание кредитного счета обычным пользователем
+    public CreditAccountResponseDto createAccountforUser() {
+        User user = getCurrentUser();
+        Long userId = user.getUserId();
+        log.info("Creating credit account by user{} with limit {} and rate {}", userId, defaultCreditLimit, defaultInterestRate);
+        try {
+
+            if (!creditAccountRepository.findByUserUserId(userId).isEmpty()) {
+                throw new RuntimeException("User can make only 1 credit account by himself");
+            }
+
+            CreditAccount acc = new CreditAccount();
+            acc.setUser(user);
+            acc.setAccountNumber(generateUniqueAccountNumber());
+            acc.setCreditLimit(defaultCreditLimit);
+            acc.setBalance(acc.getCreditLimit());
+            acc.setInterestRate(defaultInterestRate);
+            acc.setMinimumPaymentRate(defaultMinimumPaymentRate);
+            acc.setGracePeriod(defaultGracePeriod);
+            acc.setAccruedInterest(BigDecimal.ZERO);
+            acc.setAccountType(AccountType.CREDIT);
+
+            CreditAccount saved = creditAccountRepository.save(acc);
+            log.info("Credit account {} created for user {}", saved.getAccountNumber(), userId);
+            return CreditAccountMapper.toDto(saved);
+        } catch (Exception e) {
+            log.error("Error creating credit account: {}", e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    // Обработка операции пополнения кредитного счета
     @Override
     public Account processDeposit(Account account, BigDecimal amount) {
         log.info("Depositing to credit account {} amount {}", account.getAccountNumber(), amount);
@@ -129,6 +179,7 @@ public class CreditAccountService extends AbstractAccountService {
         }
     }
 
+    // Обработка операции снятия с кредитного счета
     @Override
     public Account processWithdraw(Account account, BigDecimal amount) {
         log.info("Withdrawing from credit account {} amount {}", account.getAccountNumber(), amount);
@@ -166,6 +217,7 @@ public class CreditAccountService extends AbstractAccountService {
         }
     }
 
+    // Удаление кредитного счета по номеру (только для администратора)
     @PreAuthorize("hasRole('ADMIN')")
     public void deleteByAccountNumber(String accountNumber) {
         log.info("Deleting credit account: {}", accountNumber);
@@ -184,6 +236,7 @@ public class CreditAccountService extends AbstractAccountService {
         }
     }
 
+    // Увеличение кредитного лимита (только для администратора)
     @PreAuthorize("hasRole('ADMIN')")
     public CreditAccount increaseCreditLimit(String accountNumber, BigDecimal newLimit) {
         log.info("Increasing credit limit for account {} to {}", accountNumber, newLimit);
@@ -206,6 +259,7 @@ public class CreditAccountService extends AbstractAccountService {
         }
     }
 
+    // Уменьшение кредитного лимита (только для администратора)
     @PreAuthorize("hasRole('ADMIN')")
     public CreditAccount decreaseCreditLimit(String accountNumber, BigDecimal newLimit) {
         log.info("Decreasing credit limit for account {} to {}", accountNumber, newLimit);
@@ -229,6 +283,7 @@ public class CreditAccountService extends AbstractAccountService {
         }
     }
 
+    // Установка процентной ставки (только для администратора)
     @PreAuthorize("hasRole('ADMIN')")
     public CreditAccount setInterestRate(String accountNumber, BigDecimal newRate) {
         log.info("Setting new interest rate for account {}: {}", accountNumber, newRate);

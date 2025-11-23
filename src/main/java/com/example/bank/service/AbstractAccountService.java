@@ -20,7 +20,7 @@ import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.util.List;
 
-// Abstract service for bank account management
+// Абстрактный сервис для управления банковскими счетами
 @Transactional
 public abstract class AbstractAccountService {
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
@@ -38,7 +38,7 @@ public abstract class AbstractAccountService {
         this.accountSecurity = accountSecurity;
     }
 
-    // Gets the current authenticated user
+    // Получает текущего аутентифицированного пользователя
     protected User getCurrentUser() {
         log.info("Retrieving current user from security context");
         try {
@@ -59,11 +59,11 @@ public abstract class AbstractAccountService {
         }
     }
 
-    // Checks if account is blocked
+    // Проверяет, заблокирован ли счет
     protected void checkAccountBlock(Account account) {
         if (account == null) {
             log.error("Account argument is null!");
-            throw new IllegalArgumentException("Account cannot be null");
+            throw new IllegalArgumentException("Счет не может быть null");
         }
         if (Boolean.TRUE.equals(account.getBlocked())) {
             log.error("Operation attempt on blocked account {}", account.getAccountNumber());
@@ -71,7 +71,7 @@ public abstract class AbstractAccountService {
         }
     }
 
-    // Generates unique 10-digit account number
+    // Генерирует уникальный 10-значный номер счета
     public String generateUniqueAccountNumber() {
         log.info("Generating unique account number");
         String number;
@@ -88,7 +88,7 @@ public abstract class AbstractAccountService {
         }
     }
 
-    // Finds account by its number
+    // Находит счет по его номеру
     public Account getAccountByNumber(String accountNumber) {
         log.info("Searching account by number: {}", accountNumber);
         try {
@@ -103,7 +103,7 @@ public abstract class AbstractAccountService {
         }
     }
 
-    // Returns all accounts of user, or all accounts for admin
+    // Возвращает все счета пользователя или все счета для администратора
     public List<Account> findAll(User currentUser) {
         log.info("Retrieving accounts list for user: {}", currentUser.getUsername());
         try {
@@ -118,7 +118,7 @@ public abstract class AbstractAccountService {
         }
     }
 
-    // Finds account by ID
+    // Находит счет по ID
     public Account findById(Long id) {
         log.info("Searching account by ID: {}", id);
         try {
@@ -133,7 +133,7 @@ public abstract class AbstractAccountService {
         }
     }
 
-    // Updates account information
+    // Обновляет информацию о счете
     public Account update(Account account) {
         log.info("Updating account with ID: {}", account.getAccountNumber());
         try {
@@ -144,7 +144,7 @@ public abstract class AbstractAccountService {
         }
     }
 
-    // Deletes account by ID
+    // Удаляет счет по ID
     public void deleteById(Long id) {
         log.info("Deleting account by ID: {}", id);
         try {
@@ -155,7 +155,7 @@ public abstract class AbstractAccountService {
         }
     }
 
-    // Blocks account (admin only)
+    // Блокирует счет (только для администратора)
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public Account blockAccount(String accountNumber) {
@@ -170,7 +170,7 @@ public abstract class AbstractAccountService {
         }
     }
 
-    // Unblocks account (admin only)
+    // Разблокирует счет (только для администратора)
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public Account unblockAccount(String accountNumber) {
@@ -185,7 +185,7 @@ public abstract class AbstractAccountService {
         }
     }
 
-    // Gets account by ID
+    // Получает счет по ID
     protected Account getAccountById(Long accountId) {
         try {
             return accountRepository.findById(accountId)
@@ -199,13 +199,13 @@ public abstract class AbstractAccountService {
         }
     }
 
-    // Handles account deposit operation
+    // Обрабатывает операцию пополнения счета
     protected Account processDeposit(Account account, BigDecimal amount) {
         log.info("Depositing to account {} amount {}", account.getAccountNumber(), amount);
         try {
             if (amount.compareTo(BigDecimal.ZERO) <= 0) {
                 log.error("Deposit attempt with non-positive amount: {}", amount);
-                throw new IllegalArgumentException("amount amount must be greater than zero");
+                throw new IllegalArgumentException("Сумма пополнения должна быть больше нуля");
             }
             checkAccountBlock(account);
 
@@ -217,19 +217,19 @@ public abstract class AbstractAccountService {
         }
     }
 
-    // Handles account withdrawal operation
+    // Обрабатывает операцию снятия со счета
     protected Account processWithdraw(Account account, BigDecimal amount) {
         log.info("Withdrawing from account {} amount {}", account.getAccountNumber(), amount);
         try {
             if (amount.compareTo(BigDecimal.ZERO) <= 0) {
                 log.error("Withdrawal attempt with non-positive amount: {}", amount);
-                throw new IllegalArgumentException("Withdraw amount must be greater than zero");
+                throw new IllegalArgumentException("Сумма снятия должна быть больше нуля");
             }
             checkAccountBlock(account);
             BigDecimal balance = account.getBalance();
             if (amount.compareTo(balance) > 0) {
                 log.error("Insufficient funds: account {}, balance {}, attempt to withdraw {}", account.getAccountNumber(), balance, amount);
-                throw new InvalidOperationException("Not enough funds");
+                throw new InvalidOperationException("Недостаточно средств");
             }
             account.setBalance(balance.subtract(amount));
             return account;
@@ -239,22 +239,22 @@ public abstract class AbstractAccountService {
         }
     }
 
-    // Deletes account by user only if balance is zero
+    // Удаляет счет пользователем только если баланс равен нулю
     public void deleteAccount(String accountNumber) {
         log.info("User deleting account: {}", accountNumber);
         try {
-            var user = getCurrentUser();
+            User user = getCurrentUser();
             Account account = getAccountByNumber(accountNumber);
             checkAccountBlock(account);
 
             if (!account.getUser().getUserId().equals(user.getUserId())) {
                 log.error("Attempt to delete account by non-owner, userId={}, owner={}", user.getUserId(), account.getUser().getUserId());
-                throw new AccessDeniedException("User is not the account owner");
+                throw new AccessDeniedException("Пользователь не является владельцем счета");
             }
 
             if (account.getBalance().compareTo(BigDecimal.ZERO) != 0) {
                 log.error("Attempt to delete account with non-zero balance: {}, balance={}", account.getAccountNumber(), account.getBalance());
-                throw new InvalidOperationException("Cannot delete account with non-zero balance");
+                throw new InvalidOperationException("Невозможно удалить счет с ненулевым балансом");
             }
 
             accountRepository.deleteByAccountNumber(accountNumber);

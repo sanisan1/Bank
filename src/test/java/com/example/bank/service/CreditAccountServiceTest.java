@@ -2,11 +2,15 @@ package com.example.bank.service;
 
 import com.example.bank.exception.InvalidOperationException;
 import com.example.bank.model.Account.CreditAccount.CreditAccount;
+import com.example.bank.model.Account.CreditAccount.CreditAccountResponseDto;
+import com.example.bank.model.AccountType;
+import com.example.bank.model.User.User;
 import com.example.bank.repository.*;
 import com.example.bank.security.AccountSecurity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.*;
 
 import java.math.BigDecimal;
@@ -180,5 +184,9 @@ class CreditAccountServiceTest {
         assertEquals(BigDecimal.valueOf(1200), account.getBalance());
         assertEquals(BigDecimal.ZERO, account.getTotalDebt());
     }
+
+
+
+
 
 }

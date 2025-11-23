@@ -4,6 +4,7 @@ import com.example.bank.exception.InvalidOperationException;
 import com.example.bank.mapper.DebitAccountMapper;
 import com.example.bank.model.Account.DebitAccount.DebitAccount;
 import com.example.bank.model.Account.DebitAccount.DebitAccountResponse;
+import com.example.bank.model.User.User;
 import com.example.bank.repository.AccountRepository;
 import com.example.bank.repository.UserRepository;
 import com.example.bank.security.AccountSecurity;
@@ -22,11 +23,11 @@ public class DebitAccountService extends AbstractAccountService {
         super(accountRepository, userRepository, accountSecurity);
     }
 
-    // Create debit account for the current user
+    // Создание дебетвого аккаунта
     public DebitAccountResponse createAccount() {
         log.info("Creating debit account");
         try {
-            var user = getCurrentUser();
+            User user = getCurrentUser();
 
             DebitAccount account = new DebitAccount();
             account.setUser(user);

@@ -33,13 +33,15 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                            "/auth/**", 
+                            "/auth/**",
                             "/register",
                             // -- Swagger UI v3 (OpenAPI)
                             "/v3/api-docs/**",
                             "/swagger-ui/**"
                         ).permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/account/**", "/api/debit-accounts/**", "/api/credit-accounts/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/credit-accounts/**").authenticated()
+
 
                         .anyRequest().authenticated()
                 )

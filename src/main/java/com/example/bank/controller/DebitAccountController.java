@@ -11,11 +11,9 @@ import org.springframework.web.bind.annotation.*;
 public class DebitAccountController {
 
     private final DebitAccountService debitAccountService;
-    private final UserService userService;
 
-    public DebitAccountController(DebitAccountService debitAccountService, UserService userService) {
+    public DebitAccountController(DebitAccountService debitAccountService) {
         this.debitAccountService = debitAccountService;
-        this.userService = userService;
     }
 
     // ✅ Создание аккаунта
