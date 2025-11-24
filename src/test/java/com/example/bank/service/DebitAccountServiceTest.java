@@ -89,10 +89,10 @@ class DebitAccountServiceTest {
 
     @Test
     void createAccount_shouldThrowExceptionWhenUserNotAuthenticated() {
-        // Arrange
+
         when(securityContext.getAuthentication()).thenReturn(null);
 
-        // Act & Assert
+
         assertThrows(AccessDeniedException.class, () -> debitAccountService.createAccount());
         verify(accountRepository, never()).save(any(DebitAccount.class));
     }

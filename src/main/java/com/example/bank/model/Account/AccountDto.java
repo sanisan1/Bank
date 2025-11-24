@@ -1,6 +1,6 @@
 package com.example.bank.model.Account;
 
-import com.example.bank.model.AccountType;
+import com.example.bank.Enums.AccountType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

@@ -5,7 +5,7 @@ import com.example.bank.mapper.AccountMapper;
 import com.example.bank.mapper.UserMapper;
 import com.example.bank.model.Account.AccountDto;
 import com.example.bank.model.Account.DebitAccount.DebitAccount;
-import com.example.bank.model.AccountType;
+import com.example.bank.Enums.AccountType;
 import com.example.bank.model.User.CreateUserDto;
 import com.example.bank.model.User.User;
 import com.example.bank.repository.AccountRepository;
@@ -50,7 +50,7 @@ public class UserService {
 
         try {
             User savedUser = userRepository.save(user);
-            
+
             log.info("User created successfully: userId={}, username={}, blocked={}",
                     savedUser.getUserId(), savedUser.getUsername(), savedUser.getBlocked());
 
@@ -140,22 +140,23 @@ public class UserService {
     }
 
     // Получение текущего пользователя из контекста безопасности
-    private User getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !authentication.isAuthenticated()
-                || authentication.getPrincipal().equals("anonymousUser")) {
-            log.warn("Unauthorized access attempt - user not authenticated");
-            throw new AccessDeniedException("User is not authenticated");
+    public User getCurrentUser() {
+        log.info("Retrieving current user from security context");
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
+                log.error("Unauthenticated access attempt");
+                throw new AccessDeniedException("User is not authenticated");
+            }
+            String username = authentication.getName();
+            return userRepository.findByUsername(username)
+                    .orElseThrow(() -> {
+                        log.error("User not found with username={}", username);
+                        return new ResourceNotFoundException("User", "username", username);
+                    });
+        } catch (Exception e) {
+            log.error("Error retrieving user: {}", e.getMessage(), e);
+            throw e;
         }
-
-        String username = authentication.getName();
-        log.debug("Retrieving current user: username={}", username);
-
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> {
-                    log.error("Authenticated user not found in database: username={}", username);
-                    return new ResourceNotFoundException("User", "username", username);
-                });
     }
 }

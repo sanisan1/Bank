@@ -20,8 +20,8 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String fromAccount;
-    private String toAccount;
+    private String fromAccount; // отправитель
+    private String toAccount;   //получатель
     @NotNull
     @DecimalMin(value = "0.01", message = "Amount must be greater than 0")
     private BigDecimal amount;

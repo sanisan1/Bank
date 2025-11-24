@@ -1,7 +1,7 @@
 package com.example.bank.controller;
 
 import com.example.bank.model.Transaction.TransactionOperationRequest;
-import com.example.bank.model.Transaction.TransactionDto;
+import com.example.bank.model.Transaction.TransactionResponse;
 
 import com.example.bank.model.Account.AccountDto;
 import com.example.bank.model.Transaction.TransferRequest;
@@ -54,23 +54,23 @@ public class TransactionController {
 
     // Запросы данных
     @GetMapping("/by-account/{accountNumber}")
-    public List<TransactionDto> getTransactionsByAccount(@PathVariable String accountNumber) {
+    public List<TransactionResponse> getTransactionsByAccount(@PathVariable String accountNumber) {
         return transactionService.getTransactionsByAccount(accountNumber);
     }
 
     @GetMapping("/{id}")
-    public TransactionDto getTransactionById(@PathVariable Long id) {
+    public TransactionResponse getTransactionById(@PathVariable Long id) {
         return transactionService.getTransactionById(id);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/getAll")
-    public List<TransactionDto> getAllTransactions() {
+    public List<TransactionResponse> getAllTransactions() {
         return transactionService.getAllTransactions();
     }
 
     @GetMapping("/by-user/{userId}")
-    public List<TransactionDto> getTransactionsByUser(@PathVariable Long userId) {
+    public List<TransactionResponse> getTransactionsByUser(@PathVariable Long userId) {
         return transactionService.getTransactionsByUser(userId);
     }
 }

@@ -22,6 +22,8 @@ public class EventDTO {
     @NotNull
     private String accountNumber; // "4724118063"
 
+    private String accountTransferTo;
+
     @NotNull
     private BigDecimal amount;    // 100
 

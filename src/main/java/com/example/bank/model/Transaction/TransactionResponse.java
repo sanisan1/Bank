@@ -11,7 +11,8 @@ import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
-public class TransactionDto {
+public class TransactionResponse {
+    private Long Id;
     private String fromAccount;
     private String toAccount;
     private BigDecimal amount;

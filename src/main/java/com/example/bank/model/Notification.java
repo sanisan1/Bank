@@ -1,11 +1,17 @@
 package com.example.bank.model;
 
+import com.example.bank.Enums.NotflicationType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "notifications")
 public class Notification {
@@ -19,6 +25,7 @@ public class Notification {
     @NotNull
     private String title; // короткое описание ("Снятие средств", "Зачисление", "Перевод")
 
+    private String accountTransferTo;
     private String accountNumber;
 
     private String comment;
@@ -30,111 +37,9 @@ public class Notification {
     private LocalDateTime createdAt = LocalDateTime.now();
 
     private BigDecimal amount;
- 
-    // можно добавить: externalReference/transactionId для связи с транзакциями
-    private Long referenceId;
 
-    public Notification(Long id, Long userId, NotflicationType type, String title, Boolean read, String message, LocalDateTime createdAt, Long referenceId) {
-        this.id = id;
-        this.userId = userId;
-        this.type = type;
-        this.title = title;
-        this.read = read;
-        this.message = message;
-        this.createdAt = createdAt;
-        this.referenceId = referenceId;
-    }
-
-    public Notification() {
-
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-
-    public Long getReferenceId() {
-        return referenceId;
-    }
-
-    public void setReferenceId(Long referenceId) {
-        this.referenceId = referenceId;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Boolean getRead() {
-        return read;
-    }
-
-    public void setRead(Boolean read) {
-        this.read = read;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public NotflicationType getType() {
-        return type;
-    }
-
-    public void setType(NotflicationType type) {
-        this.type = type;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
-
-    public String getAccountNumber() {
-        return accountNumber;
-    }
-
-    public void setAccountNumber(String accountNumber) {
-        this.accountNumber = accountNumber;
-    }
+    private Long referenceId; //id транзакции
 }
+
+
+

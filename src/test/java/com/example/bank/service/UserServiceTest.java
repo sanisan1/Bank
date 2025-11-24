@@ -2,9 +2,8 @@ package com.example.bank.service;
 
 import com.example.bank.Enums.Role;
 import com.example.bank.exception.ResourceNotFoundException;
-import com.example.bank.model.Account.AccountDto;
 import com.example.bank.model.Account.DebitAccount.DebitAccount;
-import com.example.bank.model.AccountType;
+import com.example.bank.Enums.AccountType;
 import com.example.bank.model.User.CreateUserDto;
 import com.example.bank.model.User.User;
 import com.example.bank.repository.AccountRepository;
