@@ -1,46 +1,52 @@
-package com.example.bank.model;
+package com.example.bank.model.User;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import com.example.bank.model.Account.DebitAccount.DebitAccount;
+import com.example.bank.Enums.Role;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class CreateUserDto {
+public class UserDto {
+
     private Long userId;
 
-    @NotBlank
+
     private String username;
 
-    @NotBlank
     private String password;
-    @Email
+
     private String email;
-    @NotBlank
     private String firstName;
-    @NotBlank
     private String lastName;
-    @NotBlank
     private String phoneNumber;
 
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    private Role role;
 
 
     private LocalDateTime createdAt;
 
+
     private Boolean blocked;
 
 
-    private List<Account> accounts = new ArrayList<>();
+    private List<DebitAccount> accounts = new ArrayList<>();
 
-    public CreateUserDto() {
+    public UserDto() {
         // пустой конструктор нужен для JPA
     }
 
     // Конструктор для удобства (без ролей, так как в вашем коде роли не используются)
-    public CreateUserDto(Long userId, Boolean blocked, LocalDateTime createdAt, String phoneNumber, String lastName, String firstName, String email, String password, String username) {
+    public UserDto(Long userId, Boolean blocked, LocalDateTime createdAt, String phoneNumber, String lastName, String firstName, String email, String password, String username, Role role) {
         this.userId = userId;
         this.blocked = blocked != null ? blocked : false; // если null, ставим false
         this.createdAt = createdAt;
@@ -50,6 +56,7 @@ public class CreateUserDto {
         this.email = email;
         this.password = password;
         this.username = username;
+        this.role = role;
     }
 
     public Long getUserId() {
@@ -125,11 +132,11 @@ public class CreateUserDto {
         this.blocked = blocked;
     }
 
-    public List<Account> getAccounts() {
+    public List<DebitAccount> getAccounts() {
         return accounts;
     }
 
-    public void setAccounts(List<Account> accounts) {
+    public void setAccounts(List<DebitAccount> accounts) {
         this.accounts = accounts;
     }
 }

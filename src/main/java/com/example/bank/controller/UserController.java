@@ -1,9 +1,9 @@
 package com.example.bank.controller;
 
 import com.example.bank.mapper.UserMapper;
-import com.example.bank.model.CreateUserDto;
-import com.example.bank.model.User;
-import com.example.bank.model.UserDto;
+import com.example.bank.model.User.CreateUserDto;
+import com.example.bank.model.User.User;
+import com.example.bank.model.User.UserDto;
 import com.example.bank.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
