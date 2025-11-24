@@ -1,7 +1,7 @@
-package com.example.bank.model.Account.DebitAccount;
+package com.example.bank.model.account.debitAccount;
 
-import com.example.bank.model.Account.Account;
-import com.example.bank.model.AccountType;
+import com.example.bank.model.account.Account;
+import com.example.bank.Enums.AccountType;
 import jakarta.persistence.*;
 @Entity
 public class DebitAccount extends Account {

@@ -3,9 +3,9 @@ package com.example.bank.service;
 import com.example.bank.exception.AccountBlockedException;
 import com.example.bank.exception.InvalidOperationException;
 import com.example.bank.exception.ResourceNotFoundException;
-import com.example.bank.model.Account.Account;
+import com.example.bank.model.account.Account;
 import com.example.bank.Enums.Role;
-import com.example.bank.model.User.User;
+import com.example.bank.model.user.User;
 import com.example.bank.repository.AccountRepository;
 import com.example.bank.repository.UserRepository;
 import com.example.bank.security.AccountSecurity;
@@ -39,6 +39,7 @@ public abstract class AbstractAccountService {
     }
 
     // Получает текущего аутентифицированного пользователя
+
     protected User getCurrentUser() {
         log.info("Retrieving current user from security context");
         try {

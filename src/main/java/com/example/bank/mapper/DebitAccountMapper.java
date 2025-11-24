@@ -1,8 +1,8 @@
 package com.example.bank.mapper;
 
-import com.example.bank.model.Account.Account;
+import com.example.bank.model.account.Account;
 
-import com.example.bank.model.Account.DebitAccount.DebitAccountResponse;
+import com.example.bank.model.account.debitAccount.DebitAccountResponse;
 import org.springframework.stereotype.Component;
 
 @Component

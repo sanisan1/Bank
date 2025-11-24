@@ -3,11 +3,11 @@ package com.example.bank.service;
 import com.example.bank.exception.InvalidOperationException;
 import com.example.bank.exception.ResourceNotFoundException;
 import com.example.bank.mapper.CreditAccountMapper;
-import com.example.bank.model.Account.CreditAccount.CreditAccount;
-import com.example.bank.model.Account.CreditAccount.CreditAccountResponseDto;
-import com.example.bank.model.Account.Account;
-import com.example.bank.model.AccountType;
-import com.example.bank.model.User.User;
+import com.example.bank.model.account.creditAccount.CreditAccount;
+import com.example.bank.model.account.creditAccount.CreditAccountResponseDto;
+import com.example.bank.model.account.Account;
+import com.example.bank.Enums.AccountType;
+import com.example.bank.model.user.User;
 import com.example.bank.repository.AccountRepository;
 import com.example.bank.repository.CreditAccountRepository;
 import com.example.bank.repository.TransactionRepository;
@@ -22,7 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
 import java.math.BigDecimal;
 
 // Сервис для работы с кредитными счетами

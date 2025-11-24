@@ -1,7 +1,7 @@
 package com.example.bank.controller;
 
 
-import com.example.bank.model.Account.Account;
+import com.example.bank.model.account.Account;
 
 import com.example.bank.service.AccountServiceImpl;
 import org.springframework.http.ResponseEntity;

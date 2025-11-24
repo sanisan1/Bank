@@ -1,10 +1,10 @@
 package com.example.bank.controller;
 
-import com.example.bank.model.Transaction.TransactionOperationRequest;
-import com.example.bank.model.Transaction.TransactionDto;
+import com.example.bank.model.transaction.TransactionOperationRequest;
+import com.example.bank.model.transaction.TransactionResponse;
 
-import com.example.bank.model.Account.AccountDto;
-import com.example.bank.model.Transaction.TransferRequest;
+import com.example.bank.model.account.AccountDto;
+import com.example.bank.model.transaction.TransferRequest;
 import com.example.bank.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -54,23 +54,23 @@ public class TransactionController {
 
     // Запросы данных
     @GetMapping("/by-account/{accountNumber}")
-    public List<TransactionDto> getTransactionsByAccount(@PathVariable String accountNumber) {
+    public List<TransactionResponse> getTransactionsByAccount(@PathVariable String accountNumber) {
         return transactionService.getTransactionsByAccount(accountNumber);
     }
 
     @GetMapping("/{id}")
-    public TransactionDto getTransactionById(@PathVariable Long id) {
+    public TransactionResponse getTransactionById(@PathVariable Long id) {
         return transactionService.getTransactionById(id);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/getAll")
-    public List<TransactionDto> getAllTransactions() {
+    public List<TransactionResponse> getAllTransactions() {
         return transactionService.getAllTransactions();
     }
 
     @GetMapping("/by-user/{userId}")
-    public List<TransactionDto> getTransactionsByUser(@PathVariable Long userId) {
+    public List<TransactionResponse> getTransactionsByUser(@PathVariable Long userId) {
         return transactionService.getTransactionsByUser(userId);
     }
 }

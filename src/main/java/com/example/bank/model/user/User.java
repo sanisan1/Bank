@@ -1,6 +1,6 @@
-package com.example.bank.model.User;
+package com.example.bank.model.user;
 
-import com.example.bank.model.Account.DebitAccount.DebitAccount;
+import com.example.bank.model.account.debitAccount.DebitAccount;
 import com.example.bank.Enums.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;

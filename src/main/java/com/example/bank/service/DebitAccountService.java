@@ -1,10 +1,9 @@
 package com.example.bank.service;
 
-import com.example.bank.exception.InvalidOperationException;
 import com.example.bank.mapper.DebitAccountMapper;
-import com.example.bank.model.Account.DebitAccount.DebitAccount;
-import com.example.bank.model.Account.DebitAccount.DebitAccountResponse;
-import com.example.bank.model.User.User;
+import com.example.bank.model.account.debitAccount.DebitAccount;
+import com.example.bank.model.account.debitAccount.DebitAccountResponse;
+import com.example.bank.model.user.User;
 import com.example.bank.repository.AccountRepository;
 import com.example.bank.repository.UserRepository;
 import com.example.bank.security.AccountSecurity;

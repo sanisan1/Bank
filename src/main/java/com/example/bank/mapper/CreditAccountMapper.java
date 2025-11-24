@@ -1,7 +1,7 @@
 package com.example.bank.mapper;
 
-import com.example.bank.model.Account.CreditAccount.CreditAccount;
-import com.example.bank.model.Account.CreditAccount.CreditAccountResponseDto;
+import com.example.bank.model.account.creditAccount.CreditAccount;
+import com.example.bank.model.account.creditAccount.CreditAccountResponseDto;
 
 public class CreditAccountMapper {
 

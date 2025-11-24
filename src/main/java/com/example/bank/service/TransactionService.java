@@ -5,14 +5,14 @@ import com.example.bank.exception.InvalidOperationException;
 import com.example.bank.exception.ResourceNotFoundException;
 import com.example.bank.kafka.TransactionEventProducer;
 import com.example.bank.mapper.AccountMapper;
-import com.example.bank.mapper.EventMapper;
+import com.example.bank.mapper.NotificationMapper;
 import com.example.bank.mapper.TransactionMapper;
-import com.example.bank.model.Account.Account;
-import com.example.bank.model.Account.AccountDto;
-import com.example.bank.model.Account.CreditAccount.CreditAccount;
-import com.example.bank.model.Account.DebitAccount.DebitAccount;
-import com.example.bank.model.Transaction.Transaction;
-import com.example.bank.model.Transaction.TransactionDto;
+import com.example.bank.model.account.Account;
+import com.example.bank.model.account.AccountDto;
+import com.example.bank.model.account.creditAccount.CreditAccount;
+import com.example.bank.model.account.debitAccount.DebitAccount;
+import com.example.bank.model.transaction.Transaction;
+import com.example.bank.model.transaction.TransactionResponse;
 import com.example.bank.repository.AccountRepository;
 import com.example.bank.repository.TransactionRepository;
 import org.slf4j.Logger;
@@ -82,7 +82,7 @@ public class TransactionService {
             transaction.setComment(comment);
             transaction.setUser(acc.getUser());
             transactionRepository.save(transaction);
-            eventProducer.sendTransactionEvent(EventMapper.toEventDTO(transaction));
+            eventProducer.sendTransactionEvent(NotificationMapper.toEventDTO(transaction));
 
 
             return AccountMapper.toDto(updatedAccount);
@@ -116,7 +116,7 @@ public class TransactionService {
             transactionRepository.save(transaction);
 
 
-            eventProducer.sendTransactionEvent(EventMapper.toEventDTO(transaction));
+            eventProducer.sendTransactionEvent(NotificationMapper.toEventDTO(transaction));
 
 
             return AccountMapper.toDto(updatedAccount);
@@ -154,7 +154,7 @@ public class TransactionService {
             transaction.setUser(fromAcc.getUser());
             transactionRepository.save(transaction);
 
-            eventProducer.sendTransactionEvent(EventMapper.toEventDTO(transaction));
+            eventProducer.sendTransactionEvent(NotificationMapper.toEventDTO(transaction));
 
 
             return AccountMapper.toDto(fromAcc);
@@ -166,7 +166,7 @@ public class TransactionService {
     }
 
     // Получить транзакцию по ID
-    public TransactionDto getTransactionById(Long id) {
+    public TransactionResponse getTransactionById(Long id) {
         return TransactionMapper.toDto(
                 transactionRepository.findById(id)
                         .orElseThrow(() -> new ResourceNotFoundException("Transaction", "id", id))
@@ -175,7 +175,7 @@ public class TransactionService {
 
     // Получить все транзакции
     @PreAuthorize("hasRole('ADMIN')")
-    public List<TransactionDto> getAllTransactions() {
+    public List<TransactionResponse> getAllTransactions() {
         return transactionRepository.findAll().stream()
                 .map(TransactionMapper::toDto)
                 .collect(Collectors.toList());
@@ -183,7 +183,7 @@ public class TransactionService {
 
     // Получить транзакции по счету
     @PreAuthorize("@accountSecurity.isOwner(#accountNumber)")
-    public List<TransactionDto> getTransactionsByAccount(String accountNumber) {
+    public List<TransactionResponse> getTransactionsByAccount(String accountNumber) {
         List<Transaction> transactions = transactionRepository.findByFromAccountOrToAccount(accountNumber, accountNumber);
         return transactions.stream()
                 .map(TransactionMapper::toDto)
@@ -192,7 +192,7 @@ public class TransactionService {
 
     // Получить транзакции по пользователю
     @PreAuthorize("@accountSecurity.isSelfOrAdmin(#userId)")
-    public List<TransactionDto> getTransactionsByUser(Long userId) {
+    public List<TransactionResponse> getTransactionsByUser(Long userId) {
         List<Account> userAccounts = accountRepository.findByUserUserId(userId);
         List<String> accountNumbers = userAccounts.stream()
                 .map(Account::getAccountNumber)

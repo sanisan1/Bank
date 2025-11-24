@@ -1,8 +1,7 @@
 package com.example.bank.controller;
 
-import com.example.bank.model.Account.DebitAccount.*;
+import com.example.bank.model.account.debitAccount.*;
 import com.example.bank.service.DebitAccountService;
-import com.example.bank.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

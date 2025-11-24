@@ -1,7 +1,7 @@
 package com.example.bank.integration;
 
-import com.example.bank.model.User.CreateUserDto;
-import com.example.bank.model.User.LoginRequest;
+import com.example.bank.model.user.CreateUserDto;
+import com.example.bank.model.user.LoginRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

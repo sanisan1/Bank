@@ -1,8 +1,7 @@
-package com.example.bank.model.Account.CreditAccount;
+package com.example.bank.model.account.creditAccount;
 
-import com.example.bank.model.Account.Account;
+import com.example.bank.model.account.Account;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -1,9 +1,9 @@
 package com.example.bank.integration;
 
-import com.example.bank.model.Account.CreditAccount.CreditAccountCreateRequest;
-import com.example.bank.model.Transaction.TransactionOperationRequest;
-import com.example.bank.model.Transaction.TransferRequest;
-import com.example.bank.model.User.CreateUserDto;
+import com.example.bank.model.account.creditAccount.CreditAccountCreateRequest;
+import com.example.bank.model.transaction.TransactionOperationRequest;
+import com.example.bank.model.transaction.TransferRequest;
+import com.example.bank.model.user.CreateUserDto;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,7 +50,7 @@ public class TransactionIntegrationTest {
         adminToken = mockMvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new com.example.bank.model.User.LoginRequest("admin", "admin123"))))
+                                new com.example.bank.model.user.LoginRequest("admin", "admin123"))))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
@@ -77,7 +77,7 @@ public class TransactionIntegrationTest {
         userToken = mockMvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new com.example.bank.model.User.LoginRequest("testuser2", "password123"))))
+                                new com.example.bank.model.user.LoginRequest("testuser2", "password123"))))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()

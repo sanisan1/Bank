@@ -1,9 +1,8 @@
 package com.example.bank.controller;
 
-import com.example.bank.model.Account.*;
-import com.example.bank.model.Account.CreditAccount.CreditAccount;
-import com.example.bank.model.Account.CreditAccount.CreditAccountCreateRequest;
-import com.example.bank.model.Account.CreditAccount.CreditAccountResponseDto;
+import com.example.bank.model.account.creditAccount.CreditAccount;
+import com.example.bank.model.account.creditAccount.CreditAccountCreateRequest;
+import com.example.bank.model.account.creditAccount.CreditAccountResponseDto;
 import com.example.bank.service.CreditAccountService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;

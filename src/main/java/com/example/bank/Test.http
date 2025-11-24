@@ -3,7 +3,7 @@ POST http://localhost:8080/register
 Content-Type: application/json
 
 {
-  "username": "testuser",
+  "username": "testuser2",
   "password": "password123",
   "email": "test@example.com",
   "firstName": "Test",
@@ -16,7 +16,7 @@ POST http://localhost:8080/auth/login
 Content-Type: application/json
 
 {
-  "username": "testuser",
+  "username": "testuser2",
   "password": "password123"
 }
 
@@ -37,7 +37,7 @@ Content-Type: application/json
 
 ### Создание первого дебетового счета
 POST http://localhost:8080/api/debit-accounts
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc2MzY3NDA1NywiZXhwIjoxNzYzNjc3NjU3fQ.U15emtYK-8BcuvyNV3j3t4o46ggmoqcx86I51cRd7Js
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc2Mzk5Njk0OSwiZXhwIjoxNzY0MDAwNTQ5fQ.vWqHFhCWFtTXtA6D0QaP3RfNCl_cPYZjULY67IisJJM
 Content-Type: application/json
 
 {
@@ -50,7 +50,7 @@ client.global.set("account_number_1", response.body.accountNumber);
 
 ### Создание второго дебетового счета
 POST http://localhost:8080/api/debit-accounts
-Authorization: Bearer {{user_token}}
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjIiLCJpYXQiOjE3NjM5OTcwNDcsImV4cCI6MTc2NDAwMDY0N30.-Z-N4tgMgFb07zqW8Y-NKSUXtMYL4eWkOgQrx1bitg0
 Content-Type: application/json
 
 {
@@ -73,30 +73,30 @@ Content-Type: application/json
 
 ### Пополнение первого счета
 POST http://localhost:8080/api/transactions/deposit
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc2MzkxMDM4OCwiZXhwIjoxNzYzOTEzOTg4fQ.Iu9WJg0AWya9Yb0rVB8_im_I7_Lo6xqyeRbqtzwFeLo
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc2Mzk5Njk0OSwiZXhwIjoxNzY0MDAwNTQ5fQ.vWqHFhCWFtTXtA6D0QaP3RfNCl_cPYZjULY67IisJJM
 Content-Type: application/json
 
 {
-  "accountNumber": "0964374501",
+  "accountNumber": "0092386887",
   "amount": 5000,
   "comment": "Пополнение"
 }
 
 ### Перевод между счетами
 POST http://localhost:8080/api/transactions/transfer
-Authorization: BearereyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc2MzkxMDEwNSwiZXhwIjoxNzYzOTEzNzA1fQ.zZk5JtvzR_DIb8usrQIuGGzJ2RZEVfjrN6YCImHM0is
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc2NDAwNzUzNiwiZXhwIjoxNzY0MDExMTM2fQ.cQEfsBopanysz9vaHEajIXgni0anpTu6fnDxsS1imSc
 Content-Type: application/json
 
 {
-  "fromAccount": "8049968259",
-  "toAccount": "4724118063",
+  "fromAccount": "0092386887",
+  "toAccount": "6632163960",
   "amount": 250,
   "comment": "Перевод"
 }
 
 ### Снятие средств
 POST http://localhost:8080/api/transactions/withdraw
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc2MzY3NDA1NywiZXhwIjoxNzYzNjc3NjU3fQ.U15emtYK-8BcuvyNV3j3t4o46ggmoqcx86I51cRd7Js
+Authorization: Bearer yJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjIiLCJpYXQiOjE3NjQwMDE4MDcsImV4cCI6MTc2NDAwNTQwN30.WceG5tdl0Qp0MkitGgNaW47Lysuhx2SFQ2vBUl8ZJXs
 Content-Type: application/json
 
 {
@@ -133,4 +133,15 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc2MjcxN
 GET http://localhost:8080/api/transactions/getAll
 Authorization: Bearer yJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc2Mjk1MzI5MiwiZXhwIjoxNzYyOTU2ODkyfQ.y1jwpa-GK_aW9N9YDnXCi4YT4zaGtiJ-ezcHtxbssA0
 
+
+
+
+
+### Получить все уведомления пользователя
+GET http://localhost:8080/api/notifications/all
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjIiLCJpYXQiOjE3NjQwMDc2NTksImV4cCI6MTc2NDAxMTI1OX0.fq9qP7lsmnXx14RGsglRjSFoM1pDnWs1k3QMHwxJb-Y
+
+### Получить непрочитанные уведомления пользователя
+GET http://localhost:8080/api/notifications/unread
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjIiLCJpYXQiOjE3NjM5OTc0NzAsImV4cCI6MTc2NDAwMTA3MH0.2IL6I-vjlfh8mxNMK386ctLOI0rSdbILOLB9pRGr3JI
 

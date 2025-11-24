@@ -1,4 +1,4 @@
-package com.example.bank.model.User;
+package com.example.bank.model.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

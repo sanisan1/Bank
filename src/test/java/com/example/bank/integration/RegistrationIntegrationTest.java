@@ -1,8 +1,8 @@
 package com.example.bank.integration;
 
 import com.example.bank.Enums.Role;
-import com.example.bank.model.User.CreateUserDto;
-import com.example.bank.model.User.User;
+import com.example.bank.model.user.CreateUserDto;
+import com.example.bank.model.user.User;
 import com.example.bank.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;

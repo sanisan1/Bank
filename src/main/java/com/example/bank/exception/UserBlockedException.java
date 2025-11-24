@@ -1,6 +1,6 @@
 package com.example.bank.exception;
 
-import com.example.bank.model.User.User;
+import com.example.bank.model.user.User;
 
 public class UserBlockedException extends RuntimeException {
     public UserBlockedException(User user) {

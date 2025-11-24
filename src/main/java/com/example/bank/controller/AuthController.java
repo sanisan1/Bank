@@ -1,6 +1,6 @@
 package com.example.bank.controller;
 
-import com.example.bank.model.User.LoginRequest;
+import com.example.bank.model.user.LoginRequest;
 import com.example.bank.security.JwtUtil;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

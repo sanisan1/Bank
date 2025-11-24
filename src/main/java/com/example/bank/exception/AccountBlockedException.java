@@ -1,6 +1,6 @@
 package com.example.bank.exception;
 
-import com.example.bank.model.Account.Account;
+import com.example.bank.model.account.Account;
 
 
 public class AccountBlockedException extends RuntimeException {

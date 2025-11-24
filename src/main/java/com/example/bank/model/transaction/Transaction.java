@@ -1,7 +1,7 @@
-package com.example.bank.model.Transaction;
+package com.example.bank.model.transaction;
 
 import com.example.bank.Enums.OperationType;
-import com.example.bank.model.User.User;
+import com.example.bank.model.user.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
@@ -20,8 +20,8 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String fromAccount;
-    private String toAccount;
+    private String fromAccount; // отправитель
+    private String toAccount;   //получатель
     @NotNull
     @DecimalMin(value = "0.01", message = "Amount must be greater than 0")
     private BigDecimal amount;

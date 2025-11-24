@@ -1,7 +1,7 @@
 package com.example.bank.mapper;
 
-import com.example.bank.model.Account.Account;
-import com.example.bank.model.Account.AccountDto;
+import com.example.bank.model.account.Account;
+import com.example.bank.model.account.AccountDto;
 
 import org.springframework.stereotype.Component;
 

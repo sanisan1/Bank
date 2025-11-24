@@ -1,8 +1,8 @@
-package com.example.bank.model.Account;
+package com.example.bank.model.account;
 
 
-import com.example.bank.model.AccountType;
-import com.example.bank.model.User.User;
+import com.example.bank.Enums.AccountType;
+import com.example.bank.model.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

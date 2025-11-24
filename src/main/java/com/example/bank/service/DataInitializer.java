@@ -2,7 +2,7 @@ package com.example.bank.service;
 
 import com.example.bank.Enums.Role;
 
-import com.example.bank.model.User.User;
+import com.example.bank.model.user.User;
 import com.example.bank.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
 

@@ -2,7 +2,9 @@ package com.example.bank.controller;
 
 import com.example.bank.exception.ResourceNotFoundException;
 import com.example.bank.model.Notification;
+import com.example.bank.model.NotificationResponse;
 import com.example.bank.repository.NotificationRepository;
+import com.example.bank.service.NotificationService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,29 +13,20 @@ import java.util.List;
 @RequestMapping("/api/notifications")
 public class NotificationController {
 
-    private final NotificationRepository notificationRepository;
+    private final NotificationService notificationService;
 
-    public NotificationController(NotificationRepository notificationRepository) {
-        this.notificationRepository = notificationRepository;
-    }
-
-    // Получить все уведомления пользователя
-    @GetMapping
-    public List<Notification> getUserNotifications(@RequestParam Long userId) {
-        return notificationRepository.findByUserId(userId);
+    public NotificationController(NotificationService notificationService) {
+        this.notificationService = notificationService;
     }
 
     // Получить только непрочитанные уведомления пользователя
     @GetMapping("/unread")
-    public List<Notification> getUnreadNotifications(@RequestParam Long userId) {
-        return notificationRepository.findByUserIdAndReadFalse(userId);
+    public List<NotificationResponse> getUnreadNotifications() {
+        return notificationService.getUnreadNotification();
     }
-
-    // Отметить уведомление как прочитанное
-    @PostMapping("/{id}/read")
-    public void markAsRead(@PathVariable Long id) {
-        Notification notification = notificationRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Notification", "id" , String.valueOf(id)));
-        notification.setRead(true);
-        notificationRepository.save(notification);
+    //Получить все увдомления
+    @GetMapping("/all")
+    public List<NotificationResponse> getAllNotifications() {
+        return notificationService.getAlldNotification();
     }
 }

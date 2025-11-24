@@ -1,6 +1,6 @@
 package com.example.bank.integration;
 
-import com.example.bank.model.User.CreateUserDto;
+import com.example.bank.model.user.CreateUserDto;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,7 +37,7 @@ public class DebitAccountIntegrationTest {
         adminToken = mockMvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new com.example.bank.model.User.LoginRequest("admin", "admin123"))))
+                                new com.example.bank.model.user.LoginRequest("admin", "admin123"))))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
@@ -65,7 +64,7 @@ public class DebitAccountIntegrationTest {
         userToken = mockMvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new com.example.bank.model.User.LoginRequest("testuser2", "password123"))))
+                                new com.example.bank.model.user.LoginRequest("testuser2", "password123"))))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
@@ -90,7 +89,7 @@ public class DebitAccountIntegrationTest {
     }
 
     @Test
-    public void createDebitAccount_asUser_createsAccount() throws Exception {
+    public void reateDebitAccount_asUser_createsAccount() throws Exception {
         mockMvc.perform(post("/api/debit-accounts")
                         .header("Authorization", "Bearer " + userToken)
                         .contentType(MediaType.APPLICATION_JSON))

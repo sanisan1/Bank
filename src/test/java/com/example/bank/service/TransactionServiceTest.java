@@ -4,12 +4,12 @@ import com.example.bank.Enums.OperationType;
 import com.example.bank.exception.InvalidOperationException;
 import com.example.bank.exception.ResourceNotFoundException;
 import com.example.bank.kafka.TransactionEventProducer;
-import com.example.bank.model.Account.AccountDto;
-import com.example.bank.model.Account.CreditAccount.CreditAccount;
-import com.example.bank.model.Account.DebitAccount.DebitAccount;
-import com.example.bank.model.Transaction.Transaction;
-import com.example.bank.model.Transaction.TransactionDto;
-import com.example.bank.model.User.User;
+import com.example.bank.model.account.AccountDto;
+import com.example.bank.model.account.creditAccount.CreditAccount;
+import com.example.bank.model.account.debitAccount.DebitAccount;
+import com.example.bank.model.transaction.Transaction;
+import com.example.bank.model.transaction.TransactionResponse;
+import com.example.bank.model.user.User;
 import com.example.bank.repository.AccountRepository;
 import com.example.bank.repository.TransactionRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -187,7 +187,7 @@ class TransactionServiceTest {
         t.setType(OperationType.deposit);
         when(transactionRepository.findById(1L)).thenReturn(Optional.of(t));
 
-        TransactionDto dto = transactionService.getTransactionById(1L);
+        TransactionResponse dto = transactionService.getTransactionById(1L);
         assertEquals(BigDecimal.TEN, dto.getAmount());
     }
 
@@ -204,7 +204,7 @@ class TransactionServiceTest {
         Transaction t2 = new Transaction();
         when(transactionRepository.findAll()).thenReturn(List.of(t1, t2));
 
-        List<TransactionDto> result = transactionService.getAllTransactions();
+        List<TransactionResponse> result = transactionService.getAllTransactions();
         assertEquals(2, result.size());
     }
 
@@ -216,7 +216,7 @@ class TransactionServiceTest {
         when(transactionRepository.findByFromAccountOrToAccount("DB123", "DB123"))
                 .thenReturn(List.of(t));
 
-        List<TransactionDto> result = transactionService.getTransactionsByAccount("DB123");
+        List<TransactionResponse> result = transactionService.getTransactionsByAccount("DB123");
         assertEquals(1, result.size());
     }
 
@@ -228,7 +228,7 @@ class TransactionServiceTest {
     @Test
     void getTransactionsByUser_ShouldReturnEmptyIfNoAccounts() {
         when(accountRepository.findByUserUserId(2L)).thenReturn(List.of());
-        List<TransactionDto> result = transactionService.getTransactionsByUser(2L);
+        List<TransactionResponse> result = transactionService.getTransactionsByUser(2L);
         assertTrue(result.isEmpty());
         verify(transactionRepository, never()).findByFromAccountInOrToAccountIn(anyList(), anyList());
     }

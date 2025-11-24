@@ -1,8 +1,7 @@
-package com.example.bank.model.Transaction;
+package com.example.bank.model.transaction;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

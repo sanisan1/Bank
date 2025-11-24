@@ -1,13 +1,13 @@
-package com.example.bank.model.Account;
+package com.example.bank.model.account.debitAccount;
 
-import com.example.bank.model.AccountType;
+import com.example.bank.Enums.AccountType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 @Data
 @NoArgsConstructor
-public class AccountDto {
+public class DebitAccountResponse {
 
     private String accountNumber;
     private BigDecimal balance;

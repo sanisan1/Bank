@@ -1,6 +1,5 @@
-package com.example.bank.model.User;
+package com.example.bank.model.user;
 
-import com.example.bank.model.Account.DebitAccount.DebitAccount;
 import com.example.bank.Enums.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -8,8 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @NoArgsConstructor

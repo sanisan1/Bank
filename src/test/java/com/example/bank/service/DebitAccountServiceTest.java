@@ -2,11 +2,9 @@ package com.example.bank.service;
 
 import com.example.bank.exception.AccountBlockedException;
 import com.example.bank.exception.InvalidOperationException;
-import com.example.bank.exception.UserBlockedException;
-import com.example.bank.mapper.DebitAccountMapper;
-import com.example.bank.model.Account.DebitAccount.DebitAccount;
-import com.example.bank.model.Account.DebitAccount.DebitAccountResponse;
-import com.example.bank.model.User.User;
+import com.example.bank.model.account.debitAccount.DebitAccount;
+import com.example.bank.model.account.debitAccount.DebitAccountResponse;
+import com.example.bank.model.user.User;
 import com.example.bank.repository.AccountRepository;
 import com.example.bank.repository.UserRepository;
 import com.example.bank.security.AccountSecurity;
@@ -89,10 +87,10 @@ class DebitAccountServiceTest {
 
     @Test
     void createAccount_shouldThrowExceptionWhenUserNotAuthenticated() {
-        // Arrange
+
         when(securityContext.getAuthentication()).thenReturn(null);
 
-        // Act & Assert
+
         assertThrows(AccessDeniedException.class, () -> debitAccountService.createAccount());
         verify(accountRepository, never()).save(any(DebitAccount.class));
     }

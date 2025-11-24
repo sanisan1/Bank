@@ -1,6 +1,6 @@
 package com.example.bank.security;
 
-import com.example.bank.model.User.User;
+import com.example.bank.model.user.User;
 import com.example.bank.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

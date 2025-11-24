@@ -1,8 +1,8 @@
 package com.example.bank.mapper;
 
-import com.example.bank.model.User.CreateUserDto;
-import com.example.bank.model.User.User;
-import com.example.bank.model.User.UserDto;
+import com.example.bank.model.user.CreateUserDto;
+import com.example.bank.model.user.User;
+import com.example.bank.model.user.UserDto;
 import org.springframework.stereotype.Component;
 
 @Component
