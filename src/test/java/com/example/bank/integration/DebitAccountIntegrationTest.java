@@ -89,7 +89,7 @@ public class DebitAccountIntegrationTest {
     }
 
     @Test
-    public void reateDebitAccount_asUser_createsAccount() throws Exception {
+    public void CreateDebitAccount_asUser_createsAccount() throws Exception {
         mockMvc.perform(post("/api/debit-accounts")
                         .header("Authorization", "Bearer " + userToken)
                         .contentType(MediaType.APPLICATION_JSON))
