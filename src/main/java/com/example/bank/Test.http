@@ -3,12 +3,12 @@ POST http://localhost:8080/register
 Content-Type: application/json
 
 {
-  "username": "testuser2",
+  "username": "testuser7118",
   "password": "password123",
   "email": "test@example.com",
   "firstName": "Test",
   "lastName": "User",
-  "phoneNumber": "+1234567890"
+  "phoneNumber": "+123456789"
 }
 
 ### Аутентификация обычного пользователя
@@ -20,9 +20,6 @@ Content-Type: application/json
   "password": "password123"
 }
 
-> {%
-client.global.set("user_token", response.body.token);
-%}
 
 ### Аутентификация администратора
 POST http://localhost:8080/auth/login
@@ -37,47 +34,33 @@ Content-Type: application/json
 
 ### Создание первого дебетового счета
 POST http://localhost:8080/api/debit-accounts
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc2Mzk5Njk0OSwiZXhwIjoxNzY0MDAwNTQ5fQ.vWqHFhCWFtTXtA6D0QaP3RfNCl_cPYZjULY67IisJJM
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjIiLCJpYXQiOjE3NjQ5NTMwOTEsImV4cCI6MTc2NDk1NjY5MX0.ovzBzKTtsU7eE9iu3PLoI3oq4CoKEiGxC18TjpoInSo
 Content-Type: application/json
 
-{
-  "balance": 0
-}
 
-> {%
-client.global.set("account_number_1", response.body.accountNumber);
-%}
 
 ### Создание второго дебетового счета
 POST http://localhost:8080/api/debit-accounts
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjIiLCJpYXQiOjE3NjM5OTcwNDcsImV4cCI6MTc2NDAwMDY0N30.-Z-N4tgMgFb07zqW8Y-NKSUXtMYL4eWkOgQrx1bitg0
 Content-Type: application/json
 
-{
-  "balance": 0
-}
 
-> {%
-client.global.set("account_number_2", response.body.accountNumber);
-%}
 
-### Создание кредитного счета (только админ)
+### Создание кредитного счета
 POST http://localhost:8080/api/credit-accounts/create
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc2MzkxNzAwMCwiZXhwIjoxNzYzOTIwNjAwfQ.rlW7GUSiLPChX-jdDPw3yx0v5AnMDbGuxzYKEJ1jzR0
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjIiLCJpYXQiOjE3NjQ5NDM5MTAsImV4cCI6MTc2NDk0NzUxMH0.Pq1cSZU6SuYHq0Gm-tu_bzlhnpRkJ-u-W1F0mwLBJDg
 Content-Type: application/json
 
-{
-}
 
 
 
 ### Пополнение первого счета
 POST http://localhost:8080/api/transactions/deposit
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc2Mzk5Njk0OSwiZXhwIjoxNzY0MDAwNTQ5fQ.vWqHFhCWFtTXtA6D0QaP3RfNCl_cPYZjULY67IisJJM
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjIiLCJpYXQiOjE3NjQ5NTMwOTEsImV4cCI6MTc2NDk1NjY5MX0.ovzBzKTtsU7eE9iu3PLoI3oq4CoKEiGxC18TjpoInSo
 Content-Type: application/json
 
 {
-  "accountNumber": "0092386887",
+  "accountNumber": "3029511518",
   "amount": 5000,
   "comment": "Пополнение"
 }
@@ -105,31 +88,40 @@ Content-Type: application/json
   "comment": "Снятие"
 }
 
+###Все транзакции для пользователя
+GET http://localhost:8080/api/transactions/getAllForUser
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjIiLCJpYXQiOjE3NjQ5NTMyMzksImV4cCI6MTc2NDk1NjgzOX0.PCV15kXykP_tZvjgqvqph3yUiRtRphudQkBv_hiPydY
+
+
+
+
+###Все счаета
+GET http://localhost:8080/api/accounts/getAccounts
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjIiLCJpYXQiOjE3NjQ5NDM5MTAsImV4cCI6MTc2NDk0NzUxMH0.Pq1cSZU6SuYHq0Gm-tu_bzlhnpRkJ-u-W1F0mwLBJDg
+
 ### Увеличение кредитного лимита (только админ)
 PUT http://localhost:8080/api/credit-accounts/{{credit_account_number}}/increase-limit?newLimit=6000.00
-Authorization: Bearer {{admin_token}}
+Authorization: Bearer
 
 ### Уменьшение кредитного лимита (только админ)
 PUT http://localhost:8080/api/credit-accounts/{{credit_account_number}}/decrease-limit?newLimit=5500.00
-Authorization: Bearer {{admin_token}}
+Authorization: Bearer
 
 ### Установка процентной ставки (только админ)
 PUT http://localhost:8080/api/credit-accounts/{{credit_account_number}}/set-interest?newRate=6.5
-Authorization: Bearer {{admin_token}}
+Authorization: Bearer
 
 ### Удаление кредитного счета (только админ)
 DELETE http://localhost:8080/api/credit-accounts/{{credit_account_number}}
-Authorization: Bearer {{admin_token}}
+Authorization: Bearer
 
-### Удаление дебетового счета
-DELETE http://localhost:8080/api/debit-accounts/{{account_number_1}}
-Authorization: Bearer {{user_token}}
+
 
 ### asdasd
 POST http://localhost:8080/api/credit-accounts/accrue-interest
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc2MjcxNDE3MiwiZXhwIjoxNzYyNzE3NzcyfQ.Ukqwwvpya5IXEtoQ5-iiVE0OdZHpyS2hxyLWfsOYT5E
 
-### asd
+### Все транзакции
 GET http://localhost:8080/api/transactions/getAll
 Authorization: Bearer yJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc2Mjk1MzI5MiwiZXhwIjoxNzYyOTU2ODkyfQ.y1jwpa-GK_aW9N9YDnXCi4YT4zaGtiJ-ezcHtxbssA0
 

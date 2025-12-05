@@ -18,11 +18,10 @@ public class AccountSecurity {
     private static final Logger logger = LoggerFactory.getLogger(AccountSecurity.class);
     
     private final AccountRepository accountRepository;
-    private final UserRepository userRepository;
 
-    public AccountSecurity(AccountRepository accountRepository, UserRepository userRepository) {
+
+    public AccountSecurity(AccountRepository accountRepository) {
         this.accountRepository = accountRepository;
-        this.userRepository = userRepository;
     }
 
     public boolean isOwner(Long accountId) {

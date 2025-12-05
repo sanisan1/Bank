@@ -69,8 +69,16 @@ public class TransactionController {
         return transactionService.getAllTransactions();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/by-user/{userId}")
     public List<TransactionResponse> getTransactionsByUser(@PathVariable Long userId) {
         return transactionService.getTransactionsByUser(userId);
     }
+
+    @GetMapping("/getAllForUser")
+    public List<TransactionResponse> getTransactionsForUser() {
+        return transactionService.getTransactionsForUser();
+    }
+
+
 }

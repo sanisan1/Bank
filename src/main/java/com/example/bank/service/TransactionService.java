@@ -37,6 +37,7 @@ public class TransactionService {
     private final AccountRepository accountRepository;
     private final TransactionRepository transactionRepository;
     private final Map<Class<? extends Account>, AbstractAccountService> serviceMap;
+    private final AccountServiceImpl accountService;
 
 
     public TransactionService(
@@ -44,11 +45,12 @@ public class TransactionService {
             TransactionRepository transactionRepository,
             CreditAccountService creditAccountService,
             DebitAccountService debitAccountService,
-            TransactionEventProducer eventProducer   // <---- обязательно!
+            TransactionEventProducer eventProducer, AccountServiceImpl accountService   // <---- обязательно!
           ) {
         this.accountRepository = accountRepository;
         this.transactionRepository = transactionRepository;
         this.eventProducer = eventProducer;
+        this.accountService = accountService;
         this.serviceMap = new HashMap<>();
         this.serviceMap.put(CreditAccount.class, creditAccountService);
         this.serviceMap.put(DebitAccount.class, debitAccountService);
@@ -191,7 +193,6 @@ public class TransactionService {
     }
 
     // Получить транзакции по пользователю
-    @PreAuthorize("@accountSecurity.isSelfOrAdmin(#userId)")
     public List<TransactionResponse> getTransactionsByUser(Long userId) {
         List<Account> userAccounts = accountRepository.findByUserUserId(userId);
         List<String> accountNumbers = userAccounts.stream()
@@ -211,4 +212,13 @@ public class TransactionService {
                 .map(TransactionMapper::toDto)
                 .collect(Collectors.toList());
     }
+
+    public List<TransactionResponse> getTransactionsForUser() {
+        return getTransactionsByUser(accountService.getCurrentUser().getUserId());
+    }
+
+
+
+
+
 }
