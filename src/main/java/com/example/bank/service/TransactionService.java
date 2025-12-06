@@ -132,6 +132,10 @@ public class TransactionService {
     @Transactional
     @PreAuthorize("@accountSecurity.isOwner(#fromNumber)")
     public AccountDto transfer(String fromNumber, String toNumber, BigDecimal amount, String comment) {
+        if (fromNumber.equals(toNumber)) {
+            throw new IllegalArgumentException("Невозможно перевести средства на тот же счёт");
+        }
+
         log.info("Transfer: {} → {}, amount {}", fromNumber, toNumber, amount);
         try {
             Account fromAcc = getAccountByNumber(fromNumber);
