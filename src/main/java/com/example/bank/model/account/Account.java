@@ -20,6 +20,7 @@ public abstract class Account {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonIgnore
     private long id;
 
     @Column(length = 10, unique = true, nullable = false)

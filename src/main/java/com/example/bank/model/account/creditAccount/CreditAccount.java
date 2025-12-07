@@ -1,6 +1,7 @@
 package com.example.bank.model.account.creditAccount;
 
 import com.example.bank.model.account.Account;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -35,7 +36,8 @@ public class CreditAccount extends Account {
     @NotNull
     private BigDecimal minimumPaymentRate = BigDecimal.valueOf(5);
     
-    // Грейс-период в днях (по умолчанию 0)
+    // Грейс-период в днях пока нет реализации скрываем
+    @JsonIgnore
     @NotNull
     private Integer gracePeriod = 0;
     

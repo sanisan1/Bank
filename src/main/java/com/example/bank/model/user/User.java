@@ -20,6 +20,7 @@ import java.util.List;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonIgnore
     private Long userId;
 
     @Column(unique = true, nullable = false)
