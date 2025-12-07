@@ -76,18 +76,23 @@ public abstract class AbstractAccountService {
     public String generateUniqueAccountNumber() {
         log.info("Generating unique account number");
         String number;
-        long bound = 1_000_000_0000L;
+        long min = 1_000_000_000L;   // 10-значное число, первая цифра 1
+        long max = 9_999_999_999L;   // максимум, первая цифра 9
+
         try {
             do {
-                long randomNum = Math.abs(secureRandom.nextLong()) % bound;
-                number = String.format("%010d", randomNum);
+                long randomNum = Math.abs(secureRandom.nextLong());
+                long valueInRange = min + (randomNum % (max - min + 1)); // [min, max]
+                number = Long.toString(valueInRange);                    // без форматирования
             } while (accountRepository.existsByAccountNumber(number));
+
             return number;
         } catch (Exception e) {
             log.error("Error generating account number: {}", e.getMessage(), e);
             throw e;
         }
     }
+
 
     // Находит счет по его номеру
     public Account getAccountByNumber(String accountNumber) {
