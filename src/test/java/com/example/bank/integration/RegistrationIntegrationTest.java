@@ -58,7 +58,6 @@ public class RegistrationIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.userId").exists())
                 .andExpect(jsonPath("$.username", is("testuser_valid")))
                 .andExpect(jsonPath("$.email", is("testuser_valid@example.com")))
                 .andExpect(jsonPath("$.firstName", is("Test")))

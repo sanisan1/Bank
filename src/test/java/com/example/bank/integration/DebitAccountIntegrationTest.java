@@ -1,6 +1,8 @@
 package com.example.bank.integration;
 
 import com.example.bank.model.user.CreateUserDto;
+import com.example.bank.model.user.User;
+import com.example.bank.repository.UserRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +21,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Transactional
 public class DebitAccountIntegrationTest {
+
+    @Autowired
+    private UserRepository userRepository;
+
 
     @Autowired
     private MockMvc mockMvc;
@@ -70,9 +76,9 @@ public class DebitAccountIntegrationTest {
                 .getResponse()
                 .getContentAsString();
 
-        // Извлекаем ID пользователя из ответа
-        JsonNode userJson = objectMapper.readTree(userResponse);
-        userId = userJson.get("userId").asLong();
+        User user = userRepository.findByUsername("testuser2").orElseThrow();
+        userId = user.getUserId();
+
 
         // Создаем дебетовый аккаунт
         String accountResponse = mockMvc.perform(post("/api/debit-accounts")

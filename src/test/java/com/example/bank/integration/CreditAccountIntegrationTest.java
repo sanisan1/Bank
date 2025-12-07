@@ -2,6 +2,8 @@ package com.example.bank.integration;
 
 import com.example.bank.model.account.creditAccount.CreditAccountCreateRequest;
 import com.example.bank.model.user.CreateUserDto;
+import com.example.bank.model.user.User;
+import com.example.bank.repository.UserRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +31,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         "bank.credit.default.grace-period=30"
 })
 public class CreditAccountIntegrationTest {
+
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private MockMvc mockMvc;
@@ -80,9 +86,10 @@ public class CreditAccountIntegrationTest {
                 .getResponse()
                 .getContentAsString();
 
-        // Извлекаем ID пользователя из ответа
-        JsonNode userJson = objectMapper.readTree(userResponse);
-        userId = userJson.get("userId").asLong();
+
+        User user = userRepository.findByUsername("testuser2").orElseThrow();
+        userId = user.getUserId();
+
 
         // Создаем кредитный аккаунт через администратора
         CreditAccountCreateRequest request = new CreditAccountCreateRequest();
