@@ -4,7 +4,6 @@ import com.example.bank.model.account.Account;
 import com.example.bank.repository.AccountRepository;
 import com.example.bank.repository.UserRepository;
 import com.example.bank.security.AccountSecurity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,7 +13,7 @@ public class AccountServiceImpl extends AbstractAccountService {
 
     public AccountServiceImpl(AccountRepository accountRepository,
                               UserRepository userRepository,
-                              AccountSecurity accountSecurity, AccountSecurity accountSecurity1) {
+                              AccountSecurity accountSecurity) {
         super(accountRepository, userRepository, accountSecurity);
     }
 
